@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrostDomain", "FrostDomain\FrostDomain.csproj", "{C9F7C89F-FD41-4615-BB2B-EA323DF12195}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Importer", "Importer\Importer.csproj", "{94ED3FE3-6204-412D-A319-367406C6C3A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DKSRDomain", "DKSRDomain\DKSRDomain.csproj", "{226C9029-D30A-411C-AF0D-A800E87F1CC7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C9F7C89F-FD41-4615-BB2B-EA323DF12195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9F7C89F-FD41-4615-BB2B-EA323DF12195}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9F7C89F-FD41-4615-BB2B-EA323DF12195}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9F7C89F-FD41-4615-BB2B-EA323DF12195}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94ED3FE3-6204-412D-A319-367406C6C3A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94ED3FE3-6204-412D-A319-367406C6C3A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94ED3FE3-6204-412D-A319-367406C6C3A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94ED3FE3-6204-412D-A319-367406C6C3A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{226C9029-D30A-411C-AF0D-A800E87F1CC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{226C9029-D30A-411C-AF0D-A800E87F1CC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{226C9029-D30A-411C-AF0D-A800E87F1CC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{226C9029-D30A-411C-AF0D-A800E87F1CC7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

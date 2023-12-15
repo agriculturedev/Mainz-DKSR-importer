@@ -7,7 +7,7 @@ public static class Websockets
     public const string TreesenseSocket = "/OutboundInterfaces/outbound/TreeSense-Realtime-Data";
     public const string ParkingLotSocket = "/OutboundInterfaces/outbound/ParkinglotSNEventTypeStatement";
     
-    public static string GetAuthenticatedWebsocketUrl(string username, string password, string socket)
+    public static string GetWebsocketUrl(string username, string password, string socket)
     {
         return $"{Prefix}{Url}{socket}";
     }
