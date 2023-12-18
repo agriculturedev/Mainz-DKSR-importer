@@ -13,22 +13,44 @@ class Program
 {
     private static string _username = "";
     private static string _password = "";
-    private readonly ILogger<Program> _logger;
-
+    private static ILogger<Program> _logger;
+    private static IConfiguration _config;
+    
     static async Task<int> Main(string[] args)
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false);
         
-        IConfiguration config = builder.Build();
+        _config = builder.Build();
         
         var services = new ServiceCollection();
         ConfigureServices(services);
         IServiceProvider serviceProvider = services.BuildServiceProvider();
-        var _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+        _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+
+        SetupAuthentication();
         
-        var authentication = config.GetSection("Authentication");
+        var importer = new EndpointImporter(_logger, _username, _password);
+        // await importer.Start();
+        
+        await TestFrost(_config["FrostBaseUrl"]);
+        
+        Process.GetCurrentProcess().WaitForExit();
+        
+        return 1;
+    }
+    
+    static void ConfigureServices(IServiceCollection services)
+    {
+        services
+            .AddLogging(builder => builder.AddConsole())
+            .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Information);
+    }
+
+    static void SetupAuthentication()
+    {
+        var authentication = _config.GetSection("Authentication");
         
         if (!authentication.Exists())
             throw new Exception("Authentication section not found in appsettings.json");
@@ -42,35 +64,25 @@ class Program
         {
             throw new Exception("Username or password is empty");
         }
-        
-        var importer = new EndpointImporter(_logger, _username, _password);
-        // await importer.Start();
-        
-        await TestFrost(config["FrostBaseUrl"]);
-        
-        Process.GetCurrentProcess().WaitForExit();
-        
-        return 1;
-    }
-    
-    static void ConfigureServices(IServiceCollection services)
-    {
-        services
-            .AddLogging(builder => builder.AddConsole())
-            .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Information);
     }
     
     static async Task TestFrost(string baseUrl)
     {
         var api = new FrostApi.FrostApi(baseUrl);
         var things = api.Things;
-        // var thing = await things.GetAllThings();
-        await things.PostThing(new Thing()
+        var thingsResponse = await things.GetAllThings();
+        // var response = await things.PostThing(new Tree()
+        // {
+        //     Name = "BaumTest",
+        //     Description = "TreeSense tree test"
+        // });
+        var response = await things.UpdateThing(new Tree()
         {
-            Name = "BaumTest",
-            Description = "TreeSense tree test"
+            Id = thingsResponse.Value.Last().Id,
+            Name = "BaumTest editiert 2",
         });
-        // Console.WriteLine(thing.Value[1].Name);
+        // Console.WriteLine(thingsResponse.Value[1].Name);
+        Console.WriteLine(response.StatusCode);
     }
 
 }
