@@ -46,52 +46,35 @@ public class FrostHttpClient
         }
     }
     
-    public HttpRequestMessage CreateGetRequest(string path)
+    public async Task<HttpResponseMessage> PostAsync(string requestUrl, StringContent requestContent)
     {
-        return new HttpRequestMessage {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri(path),
-            Version = new Version(2, 0) // has to be 1.1 for some older api's, here 2.0 worked 
-            
+        using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+        {
+            Content = requestContent
         };
+
+        return await SendRequest(request);
     }
     
-    public HttpRequestMessage CreatePostRequest(string path, string bodyContent)
+    public async Task<HttpResponseMessage> PatchAsync(string requestUrl, StringContent requestContent)
     {
-        var httpContent = new StringContent(bodyContent, Encoding.UTF8, "application/json");
-        
-        return new HttpRequestMessage {
-            Method = HttpMethod.Post,
-            RequestUri = new Uri(path),
-            Version = new Version(2, 0), // has to be 1.1 for some older api's, here 2.0 worked 
-            Content = httpContent
+        using var request = new HttpRequestMessage(HttpMethod.Patch, requestUrl)
+        {
+            Content = requestContent
         };
+
+        return await SendRequest(request);
     }
     
-    public async Task<T> ExecuteWithTryCatch<T>(Func<HttpRequestMessage> createRequest, Func<HttpResponseMessage, Task<T>> processResponse) where T : new()
+    public async Task<HttpResponseMessage> GetAsync(string requestUrl)
     {
-        T result = new();
-        HttpRequestMessage request = createRequest();
+        using var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
 
-        try
-        {
-            HttpResponseMessage response = await _client!.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                result = await processResponse(response);
-            }
-            else
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                dynamic errorObject = JsonConvert.DeserializeObject(responseContent);
-                Console.WriteLine($"Error: {errorObject}");
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
-
-        return result;
+        return await SendRequest(request);
+    }
+    
+    private async Task<HttpResponseMessage> SendRequest(HttpRequestMessage request)
+    {
+        return await _client!.SendAsync(request);
     }
 }

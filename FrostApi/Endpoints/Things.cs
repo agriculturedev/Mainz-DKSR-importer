@@ -1,3 +1,5 @@
+using System.Net.Mime;
+using System.Text;
 using FrostApi.ResponseModels;
 using Newtonsoft.Json;
 
@@ -16,17 +18,25 @@ public class Things
     
     public async Task<GetAllThingsResponse> GetAllThings()
     {
-        return await _client.ExecuteWithTryCatch<GetAllThingsResponse>(
-            () => _client.CreateGetRequest(_endpoints.GetEndpointUrl(_endpoints.Things)),
-            async response => await response.Content.ReadAsAsync<GetAllThingsResponse>()
-        );
+        var response = await _client.GetAsync(_endpoints.GetEndpointUrl(_endpoints.Things));
+        var result = await response.Content.ReadAsAsync<GetAllThingsResponse>();
+        return result;
     }
     
-    public async Task PostThing(Thing thing)
+    public async Task<HttpResponseMessage> PostThing(IThing thing)
     {
-        await _client.ExecuteWithTryCatch(
-            () => _client.CreatePostRequest(_endpoints.GetEndpointUrl(_endpoints.Things), JsonConvert.SerializeObject(thing)),
-            async response => await response.Content.ReadAsAsync<GetAllThingsResponse>()
-        );
+        var jsonContent = JsonConvert.SerializeObject(thing);
+        var content = new StringContent(jsonContent, Encoding.UTF8, MediaTypeNames.Application.Json);
+        var response = await _client.PostAsync(_endpoints.GetEndpointUrl(_endpoints.Things), content);
+        return response;
+    }
+    
+    public async Task<HttpResponseMessage> UpdateThing(IThing thing)
+    {
+        var jsonContent = JsonConvert.SerializeObject(thing);
+        var content = new StringContent(jsonContent, Encoding.UTF8, MediaTypeNames.Application.Json);
+        var url = _endpoints.GetEndpointUrl(_endpoints.Things) + "(" + thing.Id + ")";
+        var response = await _client.PatchAsync(url, content);
+        return response;
     }
 }
