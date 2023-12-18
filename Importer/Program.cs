@@ -1,6 +1,6 @@
 ﻿
 using System.Diagnostics;
-using FrostApi.ResponseModels;
+using FrostApi.ThingImplementations;
 using Importer.Importers;
 using Microsoft.Extensions.Configuration;
 
@@ -28,13 +28,14 @@ class Program
         ConfigureServices(services);
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
-
-        SetupAuthentication();
         
-        var importer = new EndpointImporter(_logger, _username, _password);
+        // var importer = new EndpointImporter(_logger, _config);
         // await importer.Start();
         
-        await TestFrost(_config["FrostBaseUrl"]);
+        var importer = new TreeImporter(_logger, _config);
+        importer.Start();
+        
+        // await TestFrost(_config["FrostBaseUrl"]);
         
         Process.GetCurrentProcess().WaitForExit();
         
@@ -46,24 +47,6 @@ class Program
         services
             .AddLogging(builder => builder.AddConsole())
             .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Information);
-    }
-
-    static void SetupAuthentication()
-    {
-        var authentication = _config.GetSection("Authentication");
-        
-        if (!authentication.Exists())
-            throw new Exception("Authentication section not found in appsettings.json");
-        
-        _username = authentication["Username"];
-        _password = authentication["Password"];
-        
-        _logger.LogInformation($"{_username}, {_password}");
-        
-        if (string.IsNullOrWhiteSpace(_username) || string.IsNullOrWhiteSpace(_password))
-        {
-            throw new Exception("Username or password is empty");
-        }
     }
     
     static async Task TestFrost(string baseUrl)

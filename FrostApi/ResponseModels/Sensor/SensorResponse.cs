@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels.Sensors;
+namespace FrostApi.ResponseModels.Sensor;
 
 public class SensorResponse
 {

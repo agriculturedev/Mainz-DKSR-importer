@@ -1,4 +1,4 @@
-using FrostApi.ResponseModels.Locations;
+using FrostApi.ResponseModels.Location;
 using Newtonsoft.Json;
 
 namespace FrostApi.ResponseModels.FeaturesOfInterest;
@@ -17,7 +17,7 @@ public class FeaturesOfInterestResponse
 
     public string EncodingType { get; set; }
 
-    public LocationProperties Feature { get; set; }
+    public LocationPropertiesResponse Feature { get; set; }
 
     [JsonProperty("Observations@iot.navigationLink")]
     public string ObservationsNavigationLink { get; set; }

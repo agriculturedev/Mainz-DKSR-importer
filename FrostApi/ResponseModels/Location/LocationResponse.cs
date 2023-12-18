@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels.Locations;
+namespace FrostApi.ResponseModels.Location;
 
 public class LocationResponse 
 {
@@ -16,7 +16,7 @@ public class LocationResponse
     
     public string EncodingType { get; set; }
 
-    public LocationProperties Location { get; set; }
+    public LocationPropertiesResponse Location { get; set; }
     
     [JsonProperty("HistoricalLocations@iot.navigationLink")]
     public string HistoricalLocationsNavigationLink { get; set; }

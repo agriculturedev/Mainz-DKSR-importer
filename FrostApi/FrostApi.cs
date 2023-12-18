@@ -1,20 +1,24 @@
 ﻿using FrostApi.Endpoints;
-using FrostApi.Endpoints.Things;
+using FrostApi.Models.Sensor;
 
 namespace FrostApi;
 
 public class FrostApi
 {
-    private FrostHttpClient? _client;
-    private Constants.Endpoints _endpoints;
-    public Things Things { get; set;  }
+    public ThingEndpoints Things { get; set;  }
+    public DataStreamEndpoints DataStreams { get; set;  }
+    public ObservationEndpoints Observations { get; set;  }
+    public ObservedPropertyEndpoints ObservedProperties { get; set;  }
+    public SensorEndpoints Sensors { get; set;  }
     
     public FrostApi(string baseUrl)
     {
-        _client = new FrostHttpClient();
-        _endpoints = new Constants.Endpoints(baseUrl);
-        
-        Things = new Things(_client, _endpoints);
+        var endpoints = new Constants.Endpoints(baseUrl);
+        Things = new ThingEndpoints(endpoints);
+        DataStreams = new DataStreamEndpoints(endpoints);
+        Observations = new ObservationEndpoints(endpoints);
+        ObservedProperties = new ObservedPropertyEndpoints(endpoints);
+        Sensors = new SensorEndpoints(endpoints);
     }
     
 }

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels.Locations;
+namespace FrostApi.ResponseModels.Location;
 
 public class GetAllLocationsResponse
 {

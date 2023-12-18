@@ -2,7 +2,7 @@
 
 public class TreesenseResponse
 {
-    public TreeSenseSensorData[] SensorData { get; set; }
+    public List<TreeSenseSensorData> SensorData { get; set; }
 }
 
 

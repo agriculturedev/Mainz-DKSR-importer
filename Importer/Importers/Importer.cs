@@ -1,20 +1,25 @@
 using System.Net;
-using System.Net.Http.Json;
-using System.Net.Mime;
 using System.Text;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
-namespace FrostApi.Endpoints;
+namespace Importer.Importers;
 
-public class FrostHttpClient
+public class Importer
 {
     protected readonly HttpClient Client;
-    protected readonly Constants.Endpoints Endpoints;
-    
-    public FrostHttpClient(Constants.Endpoints endpoints)
+    protected readonly FrostApi.FrostApi FrostApi;
+    protected static string Username { get; set; }
+    protected static string Password { get; set; }
+    protected readonly ILogger Logger;
+
+    protected Importer(ILogger logger, IConfiguration config)
     {
+        FrostApi = new FrostApi.FrostApi(config["FrostBaseUrl"] ?? throw new ArgumentNullException("FrostApiBaseUrl"));
+        Username = config["Authentication:Username"] ?? throw new ArgumentNullException("Username");
+        Password = config["Authentication:Password"] ?? throw new ArgumentNullException("Username");
         Client = SetupHttpClient();
-        Endpoints = endpoints;
+        Logger = logger;
     }
     
     private HttpClient SetupHttpClient()
@@ -28,17 +33,12 @@ public class FrostHttpClient
         client.DefaultRequestHeaders.Add("User-Agent",  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
         client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
         client.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,nl;q=0.8");
+        client.DefaultRequestHeaders.Add("Authorization", $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes($"{Username}:{Password}"))}");
         return client;
     }
     
-    protected  StringContent CreateJsonContent(object obj)
-    {
-        var jsonContent = JsonConvert.SerializeObject(obj);
-        var content = new StringContent(jsonContent, Encoding.UTF8, MediaTypeNames.Application.Json);
-        return content;
-    }
-
-    protected async Task<HttpResponseMessage> PostAsync(string requestUrl, StringContent requestContent)
+    
+    public async Task<HttpResponseMessage> PostAsync(string requestUrl, StringContent requestContent)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
         {
@@ -47,8 +47,8 @@ public class FrostHttpClient
 
         return await SendRequest(request);
     }
-
-    protected async Task<HttpResponseMessage> PatchAsync(string requestUrl, StringContent requestContent)
+    
+    public async Task<HttpResponseMessage> PatchAsync(string requestUrl, StringContent requestContent)
     {
         using var request = new HttpRequestMessage(HttpMethod.Patch, requestUrl)
         {
@@ -57,8 +57,8 @@ public class FrostHttpClient
 
         return await SendRequest(request);
     }
-
-    protected async Task<HttpResponseMessage> GetAsync(string requestUrl)
+    
+    public async Task<HttpResponseMessage> GetAsync(string requestUrl)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
 

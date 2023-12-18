@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels;
+namespace FrostApi.ResponseModels.Thing;
 
 public class ThingResponse
 {

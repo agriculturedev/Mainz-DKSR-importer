@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels.ObservedProperties;
+namespace FrostApi.ResponseModels.ObservedProperty;
 
 public class ObservedPropertyResponse
 {

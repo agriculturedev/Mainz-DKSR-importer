@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels.HistoricalLocations;
+namespace FrostApi.ResponseModels.HistoricalLocation;
 
 public class HistoricalLocationResponse
 {

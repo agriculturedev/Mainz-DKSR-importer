@@ -1,6 +1,7 @@
+using FrostApi.Models.Thing;
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels;
+namespace FrostApi.ThingImplementations;
 
 public class Tree : IThing
 {
@@ -11,12 +12,14 @@ public class Tree : IThing
     public string Name { get; set; }
 
     [JsonProperty("description")] [JsonRequired]
-    public const string Description = "Treesense tree";
+    public const string Description = "Tree";
     
+    [JsonProperty("properties")] [JsonRequired]
     public TreeProps Properties { get; set; }
 }
 
 public class TreeProps
 {
+    [JsonProperty("id")] [JsonRequired]
     public int Id { get; set; }
 }

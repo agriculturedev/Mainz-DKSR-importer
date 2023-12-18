@@ -1,6 +1,7 @@
+using FrostApi.Models.DataStream;
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels.DataStreams;
+namespace FrostApi.ResponseModels.DataStream;
 
 public class DataStreamResponse
 {

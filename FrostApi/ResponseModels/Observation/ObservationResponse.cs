@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels.Observations;
+namespace FrostApi.ResponseModels.Observation;
 
 public class ObservationResponse
 {

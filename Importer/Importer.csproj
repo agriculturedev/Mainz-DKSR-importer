@@ -35,8 +35,4 @@
       <ProjectReference Include="..\FrostApi\FrostApi.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Mappers\" />
-    </ItemGroup>
-
 </Project>

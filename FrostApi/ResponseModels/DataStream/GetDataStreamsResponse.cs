@@ -1,8 +1,8 @@
 using Newtonsoft.Json;
 
-namespace FrostApi.ResponseModels.DataStreams;
+namespace FrostApi.ResponseModels.DataStream;
 
-public class GetAllDataStreamsResponse
+public class GetDataStreamsResponse
 {
     [JsonProperty("@iot.count")] 
     public int Count { get; set; }

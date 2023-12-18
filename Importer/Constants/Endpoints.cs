@@ -11,4 +11,9 @@ public static class Endpoints
     {
         return $"{Prefix}{username}:{password}@{Url}{socket}";
     }
+    
+    public static string GetEndpointUrl(string socket)
+    {
+        return $"{Prefix}{Url}{socket}";
+    }
 }

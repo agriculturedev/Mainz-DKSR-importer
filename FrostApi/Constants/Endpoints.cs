@@ -8,7 +8,7 @@ public class Endpoints
         BaseUrl = baseUrl;
     }
     
-    public string DataStreams = "/DataStreams";
+    public string DataStreams = "/Datastreams";
     public string FeaturesOfInterest = "/FeaturesOfInterest";
     public string HistoricalLocations = "/HistoricalLocations";
     public string Locations = "/Locations";
@@ -20,5 +20,10 @@ public class Endpoints
     public string GetEndpointUrl(string endpoint)
     {
         return $"{BaseUrl}{endpoint}";
+    }
+    
+    public string GetEndpointForEntityUrl(string entity, string endpoint, int entityId)
+    {
+        return $"{BaseUrl}{entity}({entityId}){endpoint}";
     }
 }
