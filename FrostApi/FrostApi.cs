@@ -1,8 +1,5 @@
-﻿using System.Net;
-using System.Text;
-using FrostApi.Endpoints;
+﻿using FrostApi.Endpoints;
 using FrostApi.Endpoints.Things;
-using Microsoft.Extensions.Logging;
 
 namespace FrostApi;
 
