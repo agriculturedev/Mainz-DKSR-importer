@@ -21,7 +21,7 @@ public class DataStreamResponse
     
     public ObservedArea ObservedArea { get; set; }
     
-    public DateTime PhenomenonTime { get; set; }
+    public string PhenomenonTime { get; set; }
 
     [JsonProperty("ObservedProperty@iot.navigationLink")]
     public string ObservedPropertyNavigationLink { get; set; } 

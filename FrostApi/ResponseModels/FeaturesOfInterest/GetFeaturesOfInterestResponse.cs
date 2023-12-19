@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace FrostApi.ResponseModels.FeaturesOfInterest;
 
-public class GetAllFeaturesOfInterestsResponse
+public class GetFeaturesOfInterestResponse
 {
     [JsonProperty("@iot.count")] 
     public int Count { get; set; }
