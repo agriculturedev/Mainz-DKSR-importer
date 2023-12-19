@@ -18,8 +18,8 @@ if it does not, they will create it and then call the `Update()` method of the A
 communication with a Frost Server
 
 this contains response models for the FrostApi endpoints as well as models used for creating new Frost Data.
-each new Thing that will be importer should implement IThing so that it has the correct properties for the FrostApi.
-and a mapper should be added in the mapper class in the Importer project. this mapper should map all the properties that you want to add to the thing
+each new Thing that will be imported a mapper should be added in the mapper class in the Importer project. this mapper should map all the properties that you want to add to the thing.
+the `Id` property is required and it will fail if it isn't added
 
 ## - DKSRDomain
 Response models from DKSR to use for mapping to FrostApi models
