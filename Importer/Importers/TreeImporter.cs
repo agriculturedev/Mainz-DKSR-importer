@@ -1,4 +1,3 @@
-using System.Net.Mime;
 using DKSRDomain;
 using FrostApi.Models.DataStream;
 using FrostApi.Models.Location;
@@ -6,8 +5,6 @@ using FrostApi.Models.Observation;
 using FrostApi.Models.ObservedProperty;
 using FrostApi.Models.Sensor;
 using FrostApi.ResponseModels.DataStream;
-using FrostApi.ResponseModels.FeaturesOfInterest;
-using FrostApi.ResponseModels.Location;
 using FrostApi.ResponseModels.ObservedProperty;
 using FrostApi.ResponseModels.Sensor;
 using FrostApi.ResponseModels.Thing;
