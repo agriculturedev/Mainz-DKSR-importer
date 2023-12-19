@@ -12,7 +12,7 @@ public class TreeImporter : Importer
 
     public TreeImporter(ILogger logger, IConfiguration config) : base(logger, config, "Tree", "HealthState")
     {
-        _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 60); // every 60 minutes
+        _importerTimer = new Timer(Import, null, 0, 60 * 1000); // every minute
     }
 
     private async void Import(object? _)

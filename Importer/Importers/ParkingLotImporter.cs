@@ -12,7 +12,7 @@ public class ParkingLotImporter : Importer
 
     public ParkingLotImporter(ILogger logger, IConfiguration config) : base(logger, config, "ParkingLot", "Occupancy")
     {
-        _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 2); // every 2 minutes
+        _importerTimer = new Timer(Import, null, 0, 60 * 1000); // every minute
     }
 
     private async void Import(object? _)
