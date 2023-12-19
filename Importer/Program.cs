@@ -27,13 +27,8 @@ internal class Program
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
-        // var importer = new EndpointImporter(_logger, _config);
-        // await importer.Start();
-
         var treeImporter = new TreeImporter(_logger, _config);
-        // var parkingLotImporter = new ParkingLotImporter(_logger, _config);
-
-        // await TestFrost(_config["FrostBaseUrl"]);
+        var parkingLotImporter = new ParkingLotImporter(_logger, _config);
 
         Process.GetCurrentProcess().WaitForExit();
 
@@ -44,25 +39,6 @@ internal class Program
     {
         services
             .AddLogging(builder => builder.AddConsole())
-            .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Debug);
-    }
-
-    private static async Task TestFrost(string baseUrl)
-    {
-        var api = new FrostApi.FrostApi(baseUrl);
-        var things = api.Things;
-        var thingsResponse = await things.GetAllThings();
-        // var response = await things.PostThing(new Tree()
-        // {
-        //     Name = "BaumTest",
-        //     Description = "TreeSense tree test"
-        // });
-        var response = await things.UpdateThing(new Tree
-        {
-            Id = thingsResponse.Value.Last().Id,
-            Name = "BaumTest editiert 2"
-        });
-        // Console.WriteLine(thingsResponse.Value[1].Name);
-        Console.WriteLine(response.StatusCode);
+            .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Information);
     }
 }

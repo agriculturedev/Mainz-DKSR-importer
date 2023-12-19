@@ -12,7 +12,6 @@ public class FrostApi
         Observations = new ObservationEndpoints(endpoints);
         ObservedProperties = new ObservedPropertyEndpoints(endpoints);
         Sensors = new SensorEndpoints(endpoints);
-        FeatureOfInterest = new FeatureOfInterestEndpoints(endpoints);
         Locations = new LocationEndpoints(endpoints);
     }
 
@@ -21,6 +20,5 @@ public class FrostApi
     public ObservationEndpoints Observations { get; set; }
     public ObservedPropertyEndpoints ObservedProperties { get; set; }
     public SensorEndpoints Sensors { get; set; }
-    public FeatureOfInterestEndpoints FeatureOfInterest { get; set; }
     public LocationEndpoints Locations { get; set; }
 }

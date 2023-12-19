@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace FrostApi.Models.Thing;
 
-public interface IThing
+public class Thing
 {
     [JsonProperty("description")] public const string Description = "Empty thing";
 
@@ -10,19 +10,12 @@ public interface IThing
 
     [JsonProperty("name")] public string Name { get; set; }
 
-
     [JsonProperty("properties")]
     [JsonRequired]
-    public IThingProperties Properties { get; set; }
+    public Dictionary<string, string> Properties { get; set; }
 
 
     [JsonIgnore] public double Lat { get; set; }
     [JsonIgnore] public double Lon { get; set; }
-
     [JsonIgnore] public Observation.Observation LatestObservation { get; set; }
-}
-
-public interface IThingProperties
-{
-    [JsonProperty("id")] [JsonRequired] public int Id { get; set; }
 }

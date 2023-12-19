@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text;
+using FrostApi.Models.DataStream;
+using FrostApi.Models.Location;
 using FrostApi.Models.ObservedProperty;
 using FrostApi.Models.Sensor;
 using FrostApi.Models.Thing;
@@ -12,23 +14,26 @@ using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
 
-public class Importer
+public abstract class Importer
 {
+    private readonly string _dataStreamName = "";
     protected readonly HttpClient Client;
-    protected readonly FrostApi.FrostApi FrostApi;
+    protected readonly string DataType = "";
+    private readonly FrostApi.FrostApi _frostApi;
     protected readonly ILogger Logger;
-    protected string DataType = "";
-    protected string DataStreamName = "";
 
     protected Importer(ILogger logger, IConfiguration config, string dataType, string dataStreamName)
     {
-        FrostApi = new FrostApi.FrostApi(config["FrostBaseUrl"] ?? throw new ArgumentNullException("FrostApiBaseUrl"));
+        _frostApi = new FrostApi.FrostApi(config["FrostBaseUrl"] ?? throw new ArgumentNullException("FrostBaseUrl"));
         Username = config["Authentication:Username"] ?? throw new ArgumentNullException("Username");
         Password = config["Authentication:Password"] ?? throw new ArgumentNullException("Username");
         Client = SetupHttpClient();
         Logger = logger;
         DataType = dataType;
-        DataStreamName = dataStreamName;
+        _dataStreamName = dataStreamName;
+        
+        Logger.LogInformation($"Starting {DataType} Sensor Data Collection");
+
     }
 
     protected static string Username { get; set; }
@@ -50,29 +55,39 @@ public class Importer
             $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes($"{Username}:{Password}"))}");
         return client;
     }
-    
-    
+
+    protected Task CreateNewThing(IThing thing)
+    {
+        Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties.Id} not found in Frost, creating new");
+        var postResponse = _frostApi.Things.PostThing(thing).Result;
+        if (postResponse.IsSuccessStatusCode)
+            Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties.Id} created successfully");
+        else
+            Logger.LogError($"{DataType} {thing.Name} with Id {thing.Properties.Id} could not be created");
+        return Task.CompletedTask;
+    }
+
     protected async Task<ObservedPropertyResponse> GetOrCreateHealthStateObservedProperty()
     {
-        var observedProperties = await FrostApi.ObservedProperties.GetAllObservedProperties();
+        var observedProperties = await _frostApi.ObservedProperties.GetAllObservedProperties();
         var healthStateObservedPropertyResponse =
-            observedProperties.Value.FirstOrDefault(observedProperty => observedProperty.Name == DataStreamName);
+            observedProperties.Value.FirstOrDefault(observedProperty => observedProperty.Name == _dataStreamName);
         if (healthStateObservedPropertyResponse == null)
         {
             await CreateNewObservedProperty(new ObservedProperty
             {
-                Name = DataStreamName,
-                Description = $"{DataStreamName} state of a {DataType}",
+                Name = _dataStreamName,
+                Description = $"{_dataStreamName} state of a {DataType}",
                 Definition = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
             });
 
-            observedProperties = await FrostApi.ObservedProperties.GetAllObservedProperties();
+            observedProperties = await _frostApi.ObservedProperties.GetAllObservedProperties();
             healthStateObservedPropertyResponse =
-                observedProperties.Value.FirstOrDefault(observedProperty => observedProperty.Name == DataStreamName);
+                observedProperties.Value.FirstOrDefault(observedProperty => observedProperty.Name == _dataStreamName);
             if (healthStateObservedPropertyResponse == null)
             {
-                Logger.LogError($"unable to create new {DataStreamName} Observed property");
-                throw new Exception($"unable to create new {DataStreamName} Observed property");
+                Logger.LogError($"unable to create new {_dataStreamName} Observed property");
+                throw new Exception($"unable to create new {_dataStreamName} Observed property");
             }
         }
 
@@ -81,19 +96,19 @@ public class Importer
 
     protected async Task<SensorResponse> GetOrCreateSensor(IThing thing)
     {
-        var sensors = await FrostApi.Sensors.GetAllSensors();
-        SensorResponse? healthStateSensorResponse;
+        var sensors = await _frostApi.Sensors.GetAllSensors();
+        SensorResponse? sensorResponse;
 
-        healthStateSensorResponse = sensors.Value.FirstOrDefault(sensor =>
+        sensorResponse = sensors.Value.FirstOrDefault(sensor =>
         {
-            string? parkingLotId;
-            sensor.Properties.TryGetValue("id", out parkingLotId);
-            if (parkingLotId == thing.Properties.Id.ToString() && sensor.Description == $"{DataType}Sensor")
+            string? sensorThingId;
+            sensor.Properties.TryGetValue("id", out sensorThingId);
+            if (sensorThingId == thing.Properties.Id.ToString() && sensor.Description == $"{DataType}Sensor")
                 return true;
             return false;
         });
 
-        if (healthStateSensorResponse == null)
+        if (sensorResponse == null)
         {
             await CreateNewSensor(new Sensor
             {
@@ -108,9 +123,9 @@ public class Importer
                 MetaData = ""
             });
 
-            sensors = await FrostApi.Sensors.GetAllSensors(
+            sensors = await _frostApi.Sensors.GetAllSensors(
                 $"?$filter=description eq '{DataType}Sensor' &$filter= properties/id eq '{thing.Properties.Id}'");
-            healthStateSensorResponse = sensors.Value.FirstOrDefault(sensor =>
+            sensorResponse = sensors.Value.FirstOrDefault(sensor =>
             {
                 string? treeId;
                 sensor.Properties.TryGetValue("id", out treeId);
@@ -119,24 +134,114 @@ public class Importer
                 return false;
             });
 
-            if (healthStateSensorResponse == null) throw new Exception($"unable to create new {DataType} Sensor ");
+            if (sensorResponse == null) throw new Exception($"unable to create new {DataType} Sensor ");
         }
 
-        return healthStateSensorResponse;
+        return sensorResponse;
     }
 
-    protected async Task CreateNewSensor(Sensor sensor)
+    private async Task CreateNewDataStream(IThing thing)
     {
-        var response = await FrostApi.Sensors.PostSensor(sensor);
+        var observedPropertyResponse = await GetOrCreateHealthStateObservedProperty();
+        var sensor = await GetOrCreateSensor(thing);
+
+        var dataStream = new DataStream
+        {
+            Name = $"{_dataStreamName}",
+            Description = $"{_dataStreamName} status of a {DataType}",
+            ObservationType = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+            UnitOfMeasurement = new UnitOfMeasurement
+            {
+                Name = $"{_dataStreamName}",
+                Symbol = $"{_dataStreamName}",
+                Definition = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
+            },
+            ObservedArea = new ObservedArea
+            {
+                Type = "Point",
+                Coordinates = new List<double> { thing.Lat, thing.Lon }
+            },
+            Thing = new Dictionary<string, string> { { "@iot.id", thing.Id.ToString() } },
+            ObservedProperty = new Dictionary<string, string>
+                { { "@iot.id", observedPropertyResponse.Id.ToString() } },
+            Sensor = new Dictionary<string, string> { { "@iot.id", sensor.Id.ToString() } }
+        };
+
+        var response = await _frostApi.DataStreams.PostDataStream(dataStream);
+        if (response.IsSuccessStatusCode)
+            Logger.LogDebug($"Datastream {dataStream.Name} created successfully");
+        else
+            Logger.LogError($"Datastream {dataStream.Name} could not be created");
+    }
+
+    private async Task CreateNewLocation(IThing thing)
+    {
+        var location = new ThingLocation
+        {
+            Name = "Location",
+            Description = $"Location of a {DataType}",
+            EncodingType = "application/geo+json",
+            Location = new LocationProperties
+            {
+                Type = "Point",
+                Coordinates = new List<string> { thing.Lat.ToString(), thing.Lon.ToString() }
+            },
+            Things = new List<Dictionary<string, string>> { new() { { "@iot.id", thing.Id.ToString() } } }
+        };
+
+        var response = await _frostApi.Locations.PostLocation(location);
+        if (response.IsSuccessStatusCode)
+            Logger.LogDebug($"Location {location.Name} created successfully");
+        else
+            Logger.LogError($"Location {location.Name} could not be created");
+    }
+
+    private async Task CreateLocationIfNotExists(IThing thing)
+    {
+        var locations = await _frostApi.Locations.GetLocationsForThing(thing.Id);
+        if (locations?.Value == null || locations.Value.Count == 0)
+        {
+            await CreateNewLocation(thing);
+
+            locations = await _frostApi.Locations.GetLocationsForThing(thing.Id);
+            if (locations?.Value == null || locations.Value.Count == 0)
+            {
+                Logger.LogError("unable to create new Location");
+                throw new Exception("unable to create new Location");
+            }
+        }
+    }
+
+    private async Task<GetDataStreamsResponse> GetOrCreateDataStream(IThing thing)
+    {
+        var dataStreams = await GetFrostDataStreamData(thing.Id);
+        if (dataStreams?.Value == null || dataStreams.Value.Count == 0)
+        {
+            await CreateNewDataStream(thing);
+
+            dataStreams = await GetFrostDataStreamData(thing.Id);
+            if (dataStreams?.Value == null || dataStreams.Value.Count == 0)
+            {
+                Logger.LogError($"unable to create new {_dataStreamName} Datastream");
+                throw new Exception($"unable to create new {_dataStreamName} Datastream");
+            }
+        }
+
+        return dataStreams;
+    }
+
+    private async Task CreateNewSensor(Sensor sensor)
+    {
+        var response = await _frostApi.Sensors.PostSensor(sensor);
         if (response.IsSuccessStatusCode)
             Logger.LogDebug($"Sensor {sensor.Name} created successfully");
         else
             Logger.LogError($"Sensor {sensor.Name} could not be created");
     }
 
-    protected async Task CreateNewObservedProperty(ObservedProperty observedProperty)
+    private async Task CreateNewObservedProperty(ObservedProperty observedProperty)
     {
-        var response = await FrostApi.ObservedProperties.PostObservedProperty(observedProperty);
+        var response = await _frostApi.ObservedProperties.PostObservedProperty(observedProperty);
         if (response.IsSuccessStatusCode)
             Logger.LogDebug(
                 $"ObservedProperty {observedProperty.Name} with Id {observedProperty.Id} created successfully");
@@ -144,15 +249,70 @@ public class Importer
             Logger.LogError(
                 $"ObservedProperty {observedProperty.Name} with Id {observedProperty.Id} could not be created");
     }
-    
-    protected async Task<GetThingsResponse> GetFrostThingData(int id)
+
+    private async Task AddObservation(IThing parkingLot, DataStream dataStream)
     {
-        return await FrostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/id eq '{id}'");
+        var observations = await _frostApi.Observations.GetObservationsForDataStream(dataStream.Id);
+
+        if (observations.Value.Any(observation => observation.PhenomenonTime == parkingLot.LatestObservation.PhenomenonTime))
+        {
+            Logger.LogDebug(
+                $"Observation at timestamp {parkingLot.LatestObservation.PhenomenonTime} for {DataType} {parkingLot.Properties.Id} already exists, skipping");
+            return;
+        }
+
+        parkingLot.LatestObservation.DataStream = new Dictionary<string, string> { { "@iot.id", dataStream.Id.ToString() } };
+
+        var response = await _frostApi.Observations.PostObservation(parkingLot.LatestObservation);
+        if (response.IsSuccessStatusCode)
+        {
+            Logger.LogDebug(
+                $"Observation at timestamp {parkingLot.LatestObservation.PhenomenonTime} for {DataType} {parkingLot.Id} created successfully");
+        }
+        else
+        {
+            Logger.LogError(
+                $"Observation at timestamp {parkingLot.LatestObservation.PhenomenonTime} for {DataType} {parkingLot.Id} could not be created");
+            Logger.LogError(response.Content.ReadAsStringAsync().Result);
+        }
     }
 
-    protected async Task<GetDataStreamsResponse?> GetFrostDataStreamData(int thingId)
+    protected async Task Update(IThing thing, GetThingsResponse frostParkingLot)
     {
-        return await FrostApi.DataStreams.GetDataSteamsForThing(thingId);
+        thing.Id = frostParkingLot.Value.First().Id;
+
+        Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Id} found in Frost, updating...");
+        var response = await _frostApi.Things.UpdateThing(thing);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties.Id} updated successfully");
+            await UpdateDataStream(thing);
+        }
+        else
+        {
+            Logger.LogError($"{DataType} {thing.Name} with Id {thing.Properties.Id} could not be updated");
+        }
     }
-    
+
+    private async Task UpdateDataStream(IThing thing)
+    {
+        var dataStreams = await GetOrCreateDataStream(thing);
+        var healthStateDataStream =
+            Mappers.MapFrostResponseToDataStream(dataStreams.Value.Find(dataStream =>
+                dataStream?.Name == _dataStreamName));
+
+        await CreateLocationIfNotExists(thing);
+        await AddObservation(thing, healthStateDataStream);
+    }
+
+    protected Task<GetThingsResponse> GetFrostThingData(int id)
+    {
+        return _frostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/id eq '{id}'");
+    }
+
+    protected Task<GetDataStreamsResponse?> GetFrostDataStreamData(int thingId)
+    {
+        return _frostApi.DataStreams.GetDataSteamsForThing(thingId);
+    }
 }

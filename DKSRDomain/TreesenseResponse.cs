@@ -1,4 +1,7 @@
-﻿namespace DKSRDomain;
+﻿
+using Newtonsoft.Json;
+
+namespace DKSRDomain;
 
 public class TreesenseResponse
 {
@@ -23,13 +26,30 @@ public class TreesenseResponse
 
 public class TreeSenseSensorData
 {
+    [JsonProperty("health_state")]
     public int HealthState { get; set; }
+    
+    [JsonProperty("lng")]
     public string Lng { get; set; }
+    
+    [JsonProperty("name")]
     public string Name { get; set; }
+    
+    [JsonProperty("id")]
     public string Id { get; set; }
+    [JsonProperty("hardware_serials")]
+
     public string[] HardwareSerials { get; set; }
+    
+    [JsonProperty("lat")]
     public string Lat { get; set; }
+    
+    [JsonProperty("timestamp")]
     public DateTime Timestamp { get; set; }
+    
+    [JsonProperty("SID")]
     public string Sid { get; set; }
-    public string[] Headers { get; set; }
+    
+    [JsonProperty("_headers")]
+    public Dictionary<string, string> Headers { get; set; }
 }
