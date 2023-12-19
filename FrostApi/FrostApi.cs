@@ -10,6 +10,7 @@ public class FrostApi
     public ObservationEndpoints Observations { get; set;  }
     public ObservedPropertyEndpoints ObservedProperties { get; set;  }
     public SensorEndpoints Sensors { get; set;  }
+    public FeatureOfInteresEndpoints FeatureOfInterest { get; set;  }
     
     public FrostApi(string baseUrl)
     {
@@ -19,6 +20,7 @@ public class FrostApi
         Observations = new ObservationEndpoints(endpoints);
         ObservedProperties = new ObservedPropertyEndpoints(endpoints);
         Sensors = new SensorEndpoints(endpoints);
+        FeatureOfInterest = new FeatureOfInteresEndpoints(endpoints);
     }
     
 }
