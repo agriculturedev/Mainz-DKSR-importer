@@ -14,6 +14,10 @@ public class Observation
 
     public DateTime PhenomenonTime { get; set; }
 
-    public Dictionary<string, string> DataStreamId { get; set; }
-    public Dictionary<string, string> FeatureOfInterestId { get; set; }
+    [JsonProperty("Datastream")]
+
+    public Dictionary<string, string> DataStream { get; set; }
+    
+    [JsonIgnore]
+    public Dictionary<string, string> FeatureOfInterest { get; set; }
 }
