@@ -5,7 +5,7 @@ namespace Importer.Mappers;
 
 public static class DataStreamMapper
 {
-    public static DataStream MapFrostResponseToDataStream(DataStreamResponse response)
+    public static DataStream MapFrostResponseToDataStream(DataStreamResponse? response)
     {
         var datastream = new DataStream
         {

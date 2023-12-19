@@ -16,7 +16,7 @@ public class SensorResponse
 
     public string MetaData { get; set; }
 
-    public Dictionary<string, string> Properties { get; set; }
+    public Dictionary<string, string?> Properties { get; set; }
 
     [JsonProperty("Datastreams@iot.navigationLink")]
     public string DatastreamsNavigationLink { get; set; }

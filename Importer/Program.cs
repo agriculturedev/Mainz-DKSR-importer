@@ -31,7 +31,6 @@ internal class Program
         // await importer.Start();
 
         var importer = new TreeImporter(_logger, _config);
-        importer.Start();
 
         // await TestFrost(_config["FrostBaseUrl"]);
 
