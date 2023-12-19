@@ -1,0 +1,7 @@
+﻿services:
+  importer:
+    image: importer
+    build:
+      context: .
+      dockerfile: Importer/Dockerfile
+    restart: unless-stopped
