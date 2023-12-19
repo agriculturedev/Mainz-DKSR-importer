@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using FrostApi.ThingImplementations;
 using Importer.Importers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,8 +8,6 @@ namespace Importer;
 
 internal class Program
 {
-    private static string _username = "";
-    private static string _password = "";
     private static ILogger<Program> _logger;
     private static IConfiguration _config;
 

@@ -14,13 +14,8 @@ public class ParkingLotImporter : Importer
     {
         _importerTimer = new Timer(Import, null, 0, 60 * 1000); // every minute
     }
-
-    private async void Import(object? _)
-    {
-        await Import();
-    }
-
-    private async Task Import()
+    
+    protected override async void Import(object? _) // object? required for running in a timer
     {
         try
         {
@@ -39,7 +34,8 @@ public class ParkingLotImporter : Importer
                     }
 
                     parkingLot = Mappers.MapDksrResponse(dksrParkingLot);
-                    await Update(parkingLot, frostParkingLot);
+                    parkingLot.Id = frostParkingLot.Value.First().Id;
+                    await Update(parkingLot);
                 }
                 catch (Exception e)
                 {

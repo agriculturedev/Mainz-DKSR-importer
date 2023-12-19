@@ -5,12 +5,12 @@ using Newtonsoft.Json;
 
 namespace FrostApi.Endpoints;
 
-public class FrostHttpClient
+public abstract class FrostHttpClient
 {
     protected readonly HttpClient Client;
     protected readonly Constants.Endpoints Endpoints;
 
-    public FrostHttpClient(Constants.Endpoints endpoints)
+    protected FrostHttpClient(Constants.Endpoints endpoints)
     {
         Client = SetupHttpClient();
         Endpoints = endpoints;

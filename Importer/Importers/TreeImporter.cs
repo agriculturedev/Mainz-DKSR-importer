@@ -15,12 +15,7 @@ public class TreeImporter : Importer
         _importerTimer = new Timer(Import, null, 0, 60 * 1000); // every minute
     }
 
-    private async void Import(object? _)
-    {
-        await Import();
-    }
-
-    private async Task Import()
+    protected override async void Import(object? _)
     {
         try
         {
@@ -39,7 +34,8 @@ public class TreeImporter : Importer
                     }
 
                     tree = Mappers.MapDksrResponse(dksrTree);
-                    await Update(tree, frostTree);
+                    tree.Id = frostTree.Value.First().Id;
+                    await Update(tree);
                 }
                 catch (Exception e)
                 {
