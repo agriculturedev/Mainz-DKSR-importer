@@ -6,6 +6,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Importer/Importer.csproj", "Importer/"]
+COPY ["FrostApi/FrostApi.csproj", "FrostApi/"]
+COPY ["DKSRDomain/DKSRDomain.csproj", "DKSRDomain/"]
 RUN dotnet restore "Importer/Importer.csproj"
 COPY . .
 WORKDIR "/src/Importer"
