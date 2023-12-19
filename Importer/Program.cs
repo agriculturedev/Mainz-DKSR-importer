@@ -30,7 +30,8 @@ internal class Program
         // var importer = new EndpointImporter(_logger, _config);
         // await importer.Start();
 
-        var importer = new TreeImporter(_logger, _config);
+        var treeImporter = new TreeImporter(_logger, _config);
+        // var parkingLotImporter = new ParkingLotImporter(_logger, _config);
 
         // await TestFrost(_config["FrostBaseUrl"]);
 
@@ -43,7 +44,7 @@ internal class Program
     {
         services
             .AddLogging(builder => builder.AddConsole())
-            .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Information);
+            .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Debug);
     }
 
     private static async Task TestFrost(string baseUrl)

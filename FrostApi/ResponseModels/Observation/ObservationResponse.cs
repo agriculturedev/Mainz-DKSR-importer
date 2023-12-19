@@ -12,7 +12,7 @@ public class ObservationResponse
 
     public DateTime? ResultTime { get; set; }
 
-    public double Result { get; set; }
+    public dynamic Result { get; set; }
 
     [JsonProperty("Datastream@iot.navigationLink")]
     public string DatastreamNavigationLink { get; set; }

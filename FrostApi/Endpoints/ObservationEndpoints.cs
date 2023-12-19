@@ -18,8 +18,8 @@ public class ObservationEndpoints : FrostHttpClient
 
     public async Task<GetObservationsResponse> GetObservationsForDataStream(int id)
     {
-        var response =
-            await GetAsync(Endpoints.GetEndpointForEntityUrl(Endpoints.DataStreams, Endpoints.Observations, id));
+        var url = Endpoints.GetEndpointForEntityUrl(Endpoints.DataStreams, Endpoints.Observations, id);
+        var response = await GetAsync(url);
         var result = await response.Content.ReadAsAsync<GetObservationsResponse>();
         return result;
     }

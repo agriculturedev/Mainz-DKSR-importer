@@ -2,15 +2,10 @@ using DKSRDomain;
 using FrostApi.Models.DataStream;
 using FrostApi.Models.Location;
 using FrostApi.Models.Observation;
-using FrostApi.Models.ObservedProperty;
-using FrostApi.Models.Sensor;
 using FrostApi.ResponseModels.DataStream;
-using FrostApi.ResponseModels.ObservedProperty;
-using FrostApi.ResponseModels.Sensor;
 using FrostApi.ResponseModels.Thing;
 using FrostApi.ThingImplementations;
 using Importer.Constants;
-using Importer.Mappers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -20,10 +15,10 @@ public class TreeImporter : Importer
 {
     private Timer _importerTimer;
 
-    public TreeImporter(ILogger logger, IConfiguration config) : base(logger, config)
+    public TreeImporter(ILogger logger, IConfiguration config) : base(logger, config, "Tree", "HealthState")
     {
         Logger.LogInformation("Starting TreeSense Sensor Data Collection");
-        _importerTimer = new Timer(Import, null, 0, 60 * 1000);
+        _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 60);
     }
 
     private async void Import(object? _)
@@ -36,18 +31,18 @@ public class TreeImporter : Importer
         try
         {
             Logger.LogInformation("Updating Treesense Data...");
-            var data = await GetDksrTreeData();
+            var data = await GetDksrData();
             foreach (var dksrTree in data.SensorData)
                 try
                 {
-                    var frostTree = await GetFrostTreeData(int.Parse(dksrTree.Id));
+                    var frostTree = await GetFrostThingData(int.Parse(dksrTree.Id));
                     if (frostTree.Value.Count == 0)
                     {
                         await CreateNewTree(dksrTree);
-                        frostTree = await GetFrostTreeData(int.Parse(dksrTree.Id));
+                        frostTree = await GetFrostThingData(int.Parse(dksrTree.Id));
                     }
 
-                    await UpdateTree(dksrTree, frostTree);
+                    await Update(dksrTree, frostTree);
                 }
                 catch (Exception e)
                 {
@@ -62,7 +57,7 @@ public class TreeImporter : Importer
 
     private Task CreateNewTree(TreeSenseSensorData dksrTree)
     {
-        var tree = TreeMapper.MapDksrResponseToTree(dksrTree);
+        var tree = Mappers.MapDksrResponse(dksrTree);
 
         Logger.LogDebug($"Tree {tree.Name} with Id {tree.Properties.Id} not found in Frost, creating new tree");
         var postResponse = FrostApi.Things.PostThing(tree).Result;
@@ -73,9 +68,9 @@ public class TreeImporter : Importer
         return Task.CompletedTask;
     }
 
-    private async Task UpdateTree(TreeSenseSensorData dksrTree, GetThingsResponse frostTree)
+    private async Task Update(TreeSenseSensorData dksrTree, GetThingsResponse frostTree)
     {
-        var tree = TreeMapper.MapDksrResponseToTree(dksrTree);
+        var tree = Mappers.MapDksrResponse(dksrTree);
 
         Logger.LogDebug($"Tree {dksrTree.Name} with Id {dksrTree.Id} found in Frost, updating tree");
 
@@ -98,7 +93,7 @@ public class TreeImporter : Importer
         var dataStreams = await GetOrCreateDataStream(dksrTree, tree);
 
         var healthStateDataStream =
-            DataStreamMapper.MapFrostResponseToDataStream(dataStreams.Value.Find(dataStream =>
+            Mappers.MapFrostResponseToDataStream(dataStreams.Value.Find(dataStream =>
                 dataStream?.Name == "HealthState"));
 
         await CreateLocationIfNotExists(dksrTree, tree);
@@ -167,7 +162,7 @@ public class TreeImporter : Importer
     private async Task CreateNewDataStream(TreeSenseSensorData dksrTree, Tree tree)
     {
         var healthStateObservedPropertyResponse = await GetOrCreateHealthStateObservedProperty();
-        var healthStateTreeSensor = await GetOrCreateTreeSensor(tree);
+        var healthStateTreeSensor = await GetOrCreateSensor(tree);
 
         var dataStream = new DataStream
         {
@@ -197,102 +192,7 @@ public class TreeImporter : Importer
         else
             Logger.LogError($"Datastream {dataStream.Name} could not be created");
     }
-
-    private async Task<ObservedPropertyResponse> GetOrCreateHealthStateObservedProperty()
-    {
-        var observedProperties = await FrostApi.ObservedProperties.GetAllObservedProperties();
-        var healthStateObservedPropertyResponse =
-            observedProperties.Value.FirstOrDefault(observedProperty => observedProperty.Name == "HealthState");
-        if (healthStateObservedPropertyResponse == null)
-        {
-            await CreateNewObservedProperty(new ObservedProperty
-            {
-                Name = "HealthState",
-                Description = "HealthState of a tree",
-                Definition = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
-            });
-
-            observedProperties = await FrostApi.ObservedProperties.GetAllObservedProperties();
-            healthStateObservedPropertyResponse =
-                observedProperties.Value.FirstOrDefault(observedProperty => observedProperty.Name == "HealthState");
-            if (healthStateObservedPropertyResponse == null)
-            {
-                Logger.LogError("unable to create new HealthState Observed property");
-                throw new Exception("unable to create new HealthState Observed property");
-            }
-        }
-
-        return healthStateObservedPropertyResponse;
-    }
-
-    private async Task<SensorResponse> GetOrCreateTreeSensor(Tree tree)
-    {
-        var sensors = await FrostApi.Sensors.GetAllSensors();
-        SensorResponse? healthStateSensorResponse;
-
-        healthStateSensorResponse = sensors.Value.FirstOrDefault(sensor =>
-        {
-            string? treeId;
-            sensor.Properties.TryGetValue("treeId", out treeId);
-            sensor.Properties.TryGetValue("id", out treeId);
-            if (treeId == tree.Properties.Id.ToString() && sensor.Description == "TreeSensor")
-                return true;
-            return false;
-        });
-
-        if (healthStateSensorResponse == null)
-        {
-            await CreateNewSensor(new Sensor
-            {
-                Name = $"TreeSensor for tree {tree.Name}",
-                Description = "TreeSensor",
-                EncodingType = "application/geo+json",
-                Properties = new SensorProps
-                {
-                    Id = tree.Properties.Id.ToString(),
-                    Name = tree.Name
-                },
-                MetaData = ""
-            });
-
-            sensors = await FrostApi.Sensors.GetAllSensors(
-                $"?$filter=description eq 'TreeSensor' &$filter= properties/id eq '{tree.Properties.Id}'");
-            healthStateSensorResponse = sensors.Value.FirstOrDefault(sensor =>
-            {
-                string? treeId;
-                sensor.Properties.TryGetValue("treeId", out treeId);
-                sensor.Properties.TryGetValue("id", out treeId);
-                if (treeId == tree.Properties.Id.ToString() && sensor.Description == "TreeSensor")
-                    return true;
-                return false;
-            });
-
-            if (healthStateSensorResponse == null) throw new Exception("unable to create new Tree Sensor ");
-        }
-
-        return healthStateSensorResponse;
-    }
-
-    private async Task CreateNewSensor(Sensor sensor)
-    {
-        var response = await FrostApi.Sensors.PostSensor(sensor);
-        if (response.IsSuccessStatusCode)
-            Logger.LogDebug($"Sensor {sensor.Name} created successfully");
-        else
-            Logger.LogError($"Sensor {sensor.Name} could not be created");
-    }
-
-    private async Task CreateNewObservedProperty(ObservedProperty observedProperty)
-    {
-        var response = await FrostApi.ObservedProperties.PostObservedProperty(observedProperty);
-        if (response.IsSuccessStatusCode)
-            Logger.LogDebug(
-                $"ObservedProperty {observedProperty.Name} with Id {observedProperty.Id} created successfully");
-        else
-            Logger.LogError(
-                $"ObservedProperty {observedProperty.Name} with Id {observedProperty.Id} could not be created");
-    }
-
+    
     private async Task AddObservation(TreeSenseSensorData dksrTree, DataStream healthStateDataStream)
     {
         var observations = await FrostApi.Observations.GetObservationsForDataStream(healthStateDataStream.Id);
@@ -325,22 +225,12 @@ public class TreeImporter : Importer
         }
     }
 
-    private async Task<TreesenseResponse> GetDksrTreeData()
+    private async Task<TreesenseResponse> GetDksrData()
     {
         var response =
             await Client.GetAsync(
                 Endpoints.GetAuthenticatedEndpointUrl(Username, Password, Endpoints.TreesenseEndpoint));
         var result = await response.Content.ReadAsAsync<TreesenseResponse>();
         return result;
-    }
-
-    private async Task<GetThingsResponse> GetFrostTreeData(int id)
-    {
-        return await FrostApi.Things.GetAllThings($"?$filter=description eq 'Tree' &$filter= properties/id eq '{id}'");
-    }
-
-    private async Task<GetDataStreamsResponse?> GetFrostDataStreamData(int thingId)
-    {
-        return await FrostApi.DataStreams.GetDataSteamsForThing(thingId);
     }
 }

@@ -5,17 +5,17 @@ namespace FrostApi.ThingImplementations;
 
 public class ParkingLot : IThing
 {
-    [JsonProperty("description")] [JsonRequired]
-    public const string Description = "Tree";
-
-    public ParkingLotProps Properties { get; set; }
-
     [JsonIgnore] public int Id { get; set; }
+    
+    [JsonProperty("description")] [JsonRequired]
+    public const string Description = "ParkingLot";
 
+    [JsonProperty("properties")]
+    [JsonRequired]
+    public ThingProperties Properties { get; set; }
+    
     [JsonProperty("name")] [JsonRequired] public string Name { get; set; }
+    [JsonIgnore] public double Lat { get; set; }
+    [JsonIgnore] public double Lon { get; set; }
 }
 
-public class ParkingLotProps
-{
-    public int Id { get; set; }
-}
