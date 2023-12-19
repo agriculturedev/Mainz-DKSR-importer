@@ -9,9 +9,14 @@ public class SensorEndpoints : FrostHttpClient
     public SensorEndpoints(Constants.Endpoints endpoints) : base(endpoints)
     { }
     
-    public async Task<GetSensorsResponse> GetAllSensors()
-    {
-        var response = await GetAsync(Endpoints.GetEndpointUrl(Endpoints.Sensors));
+    public async Task<GetSensorsResponse> GetAllSensors(string? filter = null)
+    { 
+        var url = Endpoints.GetEndpointUrl(Endpoints.Sensors);
+        if (filter != null)
+        {
+            url += filter;
+        }
+        var response = await GetAsync(url);
         var result = await response.Content.ReadAsAsync<GetSensorsResponse>();
         return result;
     }
