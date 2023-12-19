@@ -3,9 +3,9 @@ using FrostApi.ResponseModels.FeaturesOfInterest;
 
 namespace FrostApi.Endpoints;
 
-public class FeatureOfInteresEndpoints : FrostHttpClient
+public class FeatureOfInterestEndpoints : FrostHttpClient
 {
-    public FeatureOfInteresEndpoints(Constants.Endpoints endpoints) : base(endpoints)
+    public FeatureOfInterestEndpoints(Constants.Endpoints endpoints) : base(endpoints)
     { }
     
     public async Task<GetFeaturesOfInterestResponse> GetAllFeaturesOfInterest(string? filter = null)
