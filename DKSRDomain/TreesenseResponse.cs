@@ -29,9 +29,6 @@ public class TreeSenseSensorData
     [JsonProperty("health_state")]
     public int HealthState { get; set; }
     
-    [JsonProperty("lng")]
-    public string Lng { get; set; }
-    
     [JsonProperty("name")]
     public string Name { get; set; }
     
@@ -43,6 +40,8 @@ public class TreeSenseSensorData
     
     [JsonProperty("lat")]
     public string Lat { get; set; }
+    [JsonProperty("lng")]
+    public string Lng { get; set; }
     
     [JsonProperty("timestamp")]
     public DateTime Timestamp { get; set; }

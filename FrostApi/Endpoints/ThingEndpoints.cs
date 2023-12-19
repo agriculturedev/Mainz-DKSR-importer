@@ -1,5 +1,5 @@
+using FrostApi.Models.Thing;
 using FrostApi.ResponseModels.Thing;
-using IThing = FrostApi.Models.Thing.IThing;
 
 namespace FrostApi.Endpoints;
 
@@ -18,14 +18,14 @@ public class ThingEndpoints : FrostHttpClient
         return result;
     }
 
-    public async Task<HttpResponseMessage> PostThing(IThing thing)
+    public async Task<HttpResponseMessage> PostThing(Thing thing)
     {
         var content = CreateJsonContent(thing);
         var response = await Client.PostAsync(Endpoints.GetEndpointUrl(Endpoints.Things), content);
         return response;
     }
 
-    public async Task<HttpResponseMessage> UpdateThing(IThing thing)
+    public async Task<HttpResponseMessage> UpdateThing(Thing thing)
     {
         var content = CreateJsonContent(thing);
         var url = $"{Endpoints.GetEndpointUrl(Endpoints.Things)}({thing.Id})";

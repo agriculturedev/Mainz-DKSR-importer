@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Text;
 using FrostApi.Models.DataStream;
@@ -16,9 +17,9 @@ namespace Importer.Importers;
 
 public abstract class Importer
 {
-    private readonly string _dataStreamName = "";
+    private readonly string _dataStreamName;
     protected readonly HttpClient Client;
-    protected readonly string DataType = "";
+    protected readonly string DataType;
     private readonly FrostApi.FrostApi _frostApi;
     protected readonly ILogger Logger;
 
@@ -26,7 +27,7 @@ public abstract class Importer
     {
         _frostApi = new FrostApi.FrostApi(config["FrostBaseUrl"] ?? throw new ArgumentNullException("FrostBaseUrl"));
         Username = config["Authentication:Username"] ?? throw new ArgumentNullException("Username");
-        Password = config["Authentication:Password"] ?? throw new ArgumentNullException("Username");
+        Password = config["Authentication:Password"] ?? throw new ArgumentNullException("Password");
         Client = SetupHttpClient();
         Logger = logger;
         DataType = dataType;
@@ -35,8 +36,8 @@ public abstract class Importer
         Logger.LogInformation($"Starting {DataType} Sensor Data Collection");
     }
 
-    protected static string Username { get; set; }
-    protected static string Password { get; set; }
+    protected static string? Username { get; set; }
+    protected static string? Password { get; set; }
 
     private HttpClient SetupHttpClient()
     {
@@ -57,24 +58,24 @@ public abstract class Importer
 
     protected abstract void Import(object? _);
 
-    protected Task CreateNewThing(IThing thing)
+    protected Task CreateNewThing(Thing thing)
     {
-        Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties.Id} not found in Frost, creating new");
+        Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties["Id"]} not found in Frost, creating new");
         var postResponse = _frostApi.Things.PostThing(thing).Result;
         if (postResponse.IsSuccessStatusCode)
-            Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties.Id} created successfully");
+            Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties["Id"]} created successfully");
         else
-            Logger.LogError($"{DataType} {thing.Name} with Id {thing.Properties.Id} could not be created");
+            Logger.LogError($"{DataType} {thing.Name} with Id {thing.Properties["Id"]} could not be created");
         return Task.CompletedTask;
     }
-    protected async Task Update(IThing thing)
+    protected async Task Update(Thing thing)
     {
         Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Id} found in Frost, updating...");
         var response = await _frostApi.Things.UpdateThing(thing);
 
         if (response.IsSuccessStatusCode)
         {
-            Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties.Id} updated successfully");
+            Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties["Id"]} updated successfully");
             var dataStreams = await GetOrCreateDataStream(thing);
             var dataStream =
                 Mappers.MapFrostResponseToDataStream(dataStreams.Value.Find(dataStream =>
@@ -85,12 +86,12 @@ public abstract class Importer
         }
         else
         {
-            Logger.LogError($"{DataType} {thing.Name} with Id {thing.Properties.Id} could not be updated");
+            Logger.LogError($"{DataType} {thing.Name} with Id {thing.Properties["Id"]} could not be updated");
         }
     }
 
     
-    private async Task CreateLocationIfNotExists(IThing thing)
+    private async Task CreateLocationIfNotExists(Thing thing)
     {
         var locations = await _frostApi.Locations.GetLocationsForThing(thing.Id);
         if (locations?.Value == null || locations.Value.Count == 0)
@@ -105,7 +106,7 @@ public abstract class Importer
             }
         }
     }
-    private async Task CreateNewLocation(IThing thing)
+    private async Task CreateNewLocation(Thing thing)
     {
         var location = new ThingLocation
         {
@@ -115,7 +116,7 @@ public abstract class Importer
             Location = new LocationProperties
             {
                 Type = "Point",
-                Coordinates = new List<string> { thing.Lat.ToString(), thing.Lon.ToString() }
+                Coordinates = new List<string> { thing.Lat.ToString(CultureInfo.InvariantCulture), thing.Lon.ToString(CultureInfo.InvariantCulture) }
             },
             Things = new List<Dictionary<string, string>> { new() { { "@iot.id", thing.Id.ToString() } } }
         };
@@ -128,7 +129,7 @@ public abstract class Importer
     }
 
 
-    private async Task<SensorResponse> GetOrCreateSensor(IThing thing)
+    private async Task<SensorResponse> GetOrCreateSensor(Thing thing)
     {
         var sensors = await _frostApi.Sensors.GetAllSensors();
         SensorResponse? sensorResponse;
@@ -137,7 +138,7 @@ public abstract class Importer
         {
             string? sensorThingId;
             sensor.Properties.TryGetValue("id", out sensorThingId);
-            if (sensorThingId == thing.Properties.Id.ToString() && sensor.Description == $"{DataType}Sensor")
+            if (sensorThingId == thing.Properties["Id"] && sensor.Description == $"{DataType}Sensor")
                 return true;
             return false;
         });
@@ -151,19 +152,19 @@ public abstract class Importer
                 EncodingType = "application/geo+json",
                 Properties = new SensorProps
                 {
-                    Id = thing.Properties.Id.ToString(),
+                    Id = thing.Properties["Id"],
                     Name = thing.Name
                 },
                 MetaData = ""
             });
 
             sensors = await _frostApi.Sensors.GetAllSensors(
-                $"?$filter=description eq '{DataType}Sensor' &$filter= properties/id eq '{thing.Properties.Id}'");
+                $"?$filter=description eq '{DataType}Sensor' &$filter= properties/id eq '{thing.Properties["Id"]}'");
             sensorResponse = sensors.Value.FirstOrDefault(sensor =>
             {
                 string? treeId;
                 sensor.Properties.TryGetValue("id", out treeId);
-                if (treeId == thing.Properties.Id.ToString() && sensor.Description == $"{DataType}Sensor")
+                if (treeId == thing.Properties["Id"] && sensor.Description == $"{DataType}Sensor")
                     return true;
                 return false;
             });
@@ -221,35 +222,35 @@ public abstract class Importer
     }
 
     
-    private async Task AddObservation(IThing parkingLot, DataStream dataStream)
+    private async Task AddObservation(Thing thing, DataStream dataStream)
     {
         var observations = await _frostApi.Observations.GetObservationsForDataStream(dataStream.Id);
 
-        if (observations.Value.Any(observation => observation.PhenomenonTime == parkingLot.LatestObservation.PhenomenonTime))
+        if (observations.Value.Any(observation => observation.PhenomenonTime == thing.LatestObservation.PhenomenonTime))
         {
             Logger.LogDebug(
-                $"Observation at timestamp {parkingLot.LatestObservation.PhenomenonTime} for {DataType} {parkingLot.Properties.Id} already exists, skipping");
+                $"Observation at timestamp {thing.LatestObservation.PhenomenonTime} for {DataType} {thing.Properties["Id"]} already exists, skipping");
             return;
         }
 
-        parkingLot.LatestObservation.DataStream = new Dictionary<string, string> { { "@iot.id", dataStream.Id.ToString() } };
+        thing.LatestObservation.DataStream = new Dictionary<string, string> { { "@iot.id", dataStream.Id.ToString() } };
 
-        var response = await _frostApi.Observations.PostObservation(parkingLot.LatestObservation);
+        var response = await _frostApi.Observations.PostObservation(thing.LatestObservation);
         if (response.IsSuccessStatusCode)
         {
             Logger.LogDebug(
-                $"Observation at timestamp {parkingLot.LatestObservation.PhenomenonTime} for {DataType} {parkingLot.Id} created successfully");
+                $"Observation at timestamp {thing.LatestObservation.PhenomenonTime} for {DataType} {thing.Id} created successfully");
         }
         else
         {
             Logger.LogError(
-                $"Observation at timestamp {parkingLot.LatestObservation.PhenomenonTime} for {DataType} {parkingLot.Id} could not be created");
+                $"Observation at timestamp {thing.LatestObservation.PhenomenonTime} for {DataType} {thing.Id} could not be created");
             Logger.LogError(response.Content.ReadAsStringAsync().Result);
         }
     }
     
     
-    private async Task<GetDataStreamsResponse> GetOrCreateDataStream(IThing thing)
+    private async Task<GetDataStreamsResponse> GetOrCreateDataStream(Thing thing)
     {
         var dataStreams = await GetFrostDataStreamData(thing.Id);
         if (dataStreams?.Value == null || dataStreams.Value.Count == 0)
@@ -266,7 +267,7 @@ public abstract class Importer
 
         return dataStreams;
     }
-    private async Task CreateNewDataStream(IThing thing)
+    private async Task CreateNewDataStream(Thing thing)
     {
         var observedPropertyResponse = await GetOrCreateObservedProperty();
         var sensor = await GetOrCreateSensor(thing);

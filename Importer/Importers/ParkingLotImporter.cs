@@ -1,5 +1,5 @@
 using DKSRDomain;
-using FrostApi.ThingImplementations;
+using FrostApi.Models.Thing;
 using Importer.Constants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -24,16 +24,16 @@ public class ParkingLotImporter : Importer
             foreach (var dksrParkingLot in data.SensorData)
                 try
                 {
-                    ParkingLot parkingLot;
+                    Thing parkingLot;
                     var frostParkingLot = await GetFrostThingData(dksrParkingLot.ParkingSpaceId);
                     if (frostParkingLot.Value.Count == 0)
                     {
-                        parkingLot = Mappers.MapDksrResponse(dksrParkingLot);
+                        parkingLot = Mappers.MapDksrResponse(dksrParkingLot, DataType);
                         await CreateNewThing(parkingLot);
                         frostParkingLot = await GetFrostThingData(dksrParkingLot.ParkingSpaceId);
                     }
 
-                    parkingLot = Mappers.MapDksrResponse(dksrParkingLot);
+                    parkingLot = Mappers.MapDksrResponse(dksrParkingLot, DataType);
                     parkingLot.Id = frostParkingLot.Value.First().Id;
                     await Update(parkingLot);
                 }

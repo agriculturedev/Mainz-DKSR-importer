@@ -11,8 +11,12 @@ public static class Endpoints
     public const string ParkingLotEndpoint =
         "/UrbanPulseData/historic/sensordata?eventtype=2a4ce3e9-92db-455e-bece-0176c62fafba";
 
-    public static string GetAuthenticatedEndpointUrl(string username, string password, string socket)
+    public static string GetAuthenticatedEndpointUrl(string? username, string? password, string socket)
     {
+        // if username or password is null, return the unauthenticated endpoint
+        if (username == null || password == null)
+            throw new ArgumentException("username or password undefined");
+        
         return $"{Prefix}{username}:{password}@{Url}{socket}";
     }
 

@@ -1,5 +1,5 @@
 using DKSRDomain;
-using FrostApi.ThingImplementations;
+using FrostApi.Models.Thing;
 using Importer.Constants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -24,18 +24,18 @@ public class TreeImporter : Importer
             foreach (var dksrTree in data.SensorData)
                 try
                 {
-                    Tree tree;
-                    var frostTree = await GetFrostThingData(int.Parse(dksrTree.Id));
-                    if (frostTree.Value.Count == 0)
+                    Thing thing;
+                    var frostThing = await GetFrostThingData(int.Parse(dksrTree.Id));
+                    if (frostThing.Value.Count == 0)
                     {
-                        tree = Mappers.MapDksrResponse(dksrTree);
-                        await CreateNewThing(tree);
-                        frostTree = await GetFrostThingData(int.Parse(dksrTree.Id));
+                        thing = Mappers.MapDksrResponse(dksrTree, DataType);
+                        await CreateNewThing(thing);
+                        frostThing = await GetFrostThingData(int.Parse(dksrTree.Id));
                     }
 
-                    tree = Mappers.MapDksrResponse(dksrTree);
-                    tree.Id = frostTree.Value.First().Id;
-                    await Update(tree);
+                    thing = Mappers.MapDksrResponse(dksrTree, DataType);
+                    thing.Id = frostThing.Value.First().Id;
+                    await Update(thing);
                 }
                 catch (Exception e)
                 {
