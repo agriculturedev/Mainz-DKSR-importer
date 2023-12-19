@@ -19,8 +19,4 @@
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Models\HistoricalLocation\"/>
-    </ItemGroup>
-
 </Project>
