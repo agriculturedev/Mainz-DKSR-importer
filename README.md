@@ -8,7 +8,7 @@ periodically fetching data from DKSR, converting this to FrostApi format and add
 
 the importers should implement the **abstract** `Importer` class.
 each importer also passes 2 strings to the `Importer` class, one for the DataType and one for the DataStreamName.
-currently these would be "Tree" & "HealthState" and "ParkingLot" and "Occupancy" respectively.
+currently these would be "Tree" & "HealthState" and "ParkingLot" & "Occupancy" respectively.
 each importer will then start a timer defining how often it should run.
 
 they first get the DKSR data and for each they will use the `GetFrostThingData()` method to see if a thing already exists.
