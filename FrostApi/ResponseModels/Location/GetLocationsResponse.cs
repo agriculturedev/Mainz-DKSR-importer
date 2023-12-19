@@ -4,9 +4,7 @@ namespace FrostApi.ResponseModels.Location;
 
 public class GetLocationsResponse
 {
-    [JsonProperty("@iot.count")] 
-    public int Count { get; set; }
+    [JsonProperty("@iot.count")] public int Count { get; set; }
 
-    [JsonProperty("value")] 
-    public List<LocationResponse> Value { get; set; }
+    [JsonProperty("value")] public List<LocationResponse> Value { get; set; }
 }

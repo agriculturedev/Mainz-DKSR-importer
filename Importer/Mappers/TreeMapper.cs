@@ -1,8 +1,6 @@
-using System.Globalization;
 using DKSRDomain;
-using FrostApi.ThingImplementations;
-using System.Linq;
 using FrostApi.ResponseModels.Thing;
+using FrostApi.ThingImplementations;
 
 namespace Importer.Mappers;
 
@@ -18,16 +16,16 @@ public static class TreeMapper
             return tree;
         }).ToList();
     }
-    
+
     public static Tree MapDksrResponseToTree(TreeSenseSensorData treeData)
     {
         return new Tree
         {
             Name = treeData.Name,
-            Properties = new TreeProps(){ Id = int.Parse(treeData.Id) }
+            Properties = new TreeProps { Id = int.Parse(treeData.Id) }
         };
     }
-    
+
     public static List<Tree> MapFrostResponseToTrees(GetThingsResponse response)
     {
         return response.Value.Select(thing =>

@@ -5,7 +5,6 @@ public class TreesenseResponse
     public List<TreeSenseSensorData> SensorData { get; set; }
 }
 
-
 // {
 //   "health_state": 3,
 //   "lng": "8.2155556000000000000000",
@@ -34,4 +33,3 @@ public class TreeSenseSensorData
     public string Sid { get; set; }
     public string[] Headers { get; set; }
 }
-

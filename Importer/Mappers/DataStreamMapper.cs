@@ -7,14 +7,14 @@ public static class DataStreamMapper
 {
     public static DataStream MapFrostResponseToDataStream(DataStreamResponse response)
     {
-        var datastream =  new DataStream
+        var datastream = new DataStream
         {
             Id = response.Id,
             Name = response.Name,
             Description = response.Description,
             ObservationType = response.ObservationType,
             UnitOfMeasurement = response.UnitOfMeasurement,
-            ObservedArea = response.ObservedArea,
+            ObservedArea = response.ObservedArea
         };
 
         return datastream;

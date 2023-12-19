@@ -5,11 +5,9 @@ namespace FrostApi.ResponseModels.DataStream;
 
 public class DataStreamResponse
 {
-    [JsonProperty("@iot.selfLink")] 
-    public string SelfLink { get; set; }
+    [JsonProperty("@iot.selfLink")] public string SelfLink { get; set; }
 
-    [JsonProperty("@iot.id")] 
-    public int Id { get; set; }
+    [JsonProperty("@iot.id")] public int Id { get; set; }
 
     public string Name { get; set; }
 
@@ -18,21 +16,20 @@ public class DataStreamResponse
     public string ObservationType { get; set; }
 
     public UnitOfMeasurement UnitOfMeasurement { get; set; }
-    
+
     public ObservedArea ObservedArea { get; set; }
-    
+
     public string PhenomenonTime { get; set; }
 
     [JsonProperty("ObservedProperty@iot.navigationLink")]
-    public string ObservedPropertyNavigationLink { get; set; } 
-    
+    public string ObservedPropertyNavigationLink { get; set; }
+
     [JsonProperty("Sensor@iot.navigationLink")]
-    public string SensorNavigationLink { get; set; } 
-    
+    public string SensorNavigationLink { get; set; }
+
     [JsonProperty("Thing@iot.navigationLink")]
-    public string ThingNavigationLink { get; set; } 
-    
+    public string ThingNavigationLink { get; set; }
+
     [JsonProperty("Observations@iot.navigationLink")]
     public string ObservationsNavigationLink { get; set; }
-    
 }

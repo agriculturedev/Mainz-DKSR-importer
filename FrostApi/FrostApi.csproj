@@ -7,20 +7,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Logging.Abstractions">
-        <HintPath>..\..\..\..\..\..\..\home\joren\.nuget\packages\microsoft.extensions.logging.abstractions\8.0.0\lib\net8.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
-      </Reference>
-      <Reference Include="Newtonsoft.Json">
-        <HintPath>..\..\..\..\..\..\..\home\joren\.nuget\packages\newtonsoft.json\13.0.3\lib\net6.0\Newtonsoft.Json.dll</HintPath>
-      </Reference>
+        <Reference Include="Microsoft.Extensions.Logging.Abstractions">
+            <HintPath>..\..\..\..\..\..\..\home\joren\.nuget\packages\microsoft.extensions.logging.abstractions\8.0.0\lib\net8.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+        </Reference>
+        <Reference Include="Newtonsoft.Json">
+            <HintPath>..\..\..\..\..\..\..\home\joren\.nuget\packages\newtonsoft.json\13.0.3\lib\net6.0\Newtonsoft.Json.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\HistoricalLocation\" />
+        <Folder Include="Models\HistoricalLocation\"/>
     </ItemGroup>
 
 </Project>

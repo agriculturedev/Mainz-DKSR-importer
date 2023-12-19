@@ -4,11 +4,9 @@ namespace FrostApi.ResponseModels.Thing;
 
 public class ThingResponse
 {
-    [JsonProperty("@iot.selfLink")]
-    public string SelfLink { get; set; }
+    [JsonProperty("@iot.selfLink")] public string SelfLink { get; set; }
 
-    [JsonProperty("@iot.id")]
-    public int Id { get; set; }
+    [JsonProperty("@iot.id")] public int Id { get; set; }
 
     public string Name { get; set; }
 

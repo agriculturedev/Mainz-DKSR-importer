@@ -1,4 +1,3 @@
-using FrostApi.Models.DataStream;
 using FrostApi.Models.Observation;
 using FrostApi.ResponseModels.Observation;
 
@@ -19,7 +18,8 @@ public class ObservationEndpoints : FrostHttpClient
 
     public async Task<GetObservationsResponse> GetObservationsForDataStream(int id)
     {
-        var response = await GetAsync(Endpoints.GetEndpointForEntityUrl(Endpoints.DataStreams, Endpoints.Observations, id));
+        var response =
+            await GetAsync(Endpoints.GetEndpointForEntityUrl(Endpoints.DataStreams, Endpoints.Observations, id));
         var result = await response.Content.ReadAsAsync<GetObservationsResponse>();
         return result;
     }
