@@ -7,23 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="047111f5-0f7f-4a8d-9e3c-aa2965b3edd5" name="Changes" comment="update github action for portainer">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/docker-portainer.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docker-portainer.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/dotnet.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/dotnet.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DKSRDomain/DKSRDomain.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/DKSRDomain/DKSRDomain.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DKSRDomain/ParkingLotResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DKSRDomain/ParkingLotResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DKSRDomain/TreesenseResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DKSRDomain/TreesenseResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrostApi/Models/Thing/Thing.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FrostApi/Models/Thing/Thing.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Importer/Constants/Endpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Importer/Constants/Endpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Importer/Importer.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Importer/Importer.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Importer/Importers/Importer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Importer/Importers/Importer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Importer/Importers/ParkingLotImporter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Importer/Importers/ParkingLotImporter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Importer/Importers/TreeImporter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Importer/Importers/TreeImporter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Importer/Mappers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Importer/Mappers.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Importer/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Importer/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Importer/appsettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-    </list>
+    <list default="true" id="047111f5-0f7f-4a8d-9e3c-aa2965b3edd5" name="Changes" comment="implement env variables" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,22 +21,16 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="elie-master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="SHOW_RECENT_BRANCHES" value="false" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/DKSRDomain/ParkingLotResponse.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/DKSRDomain/TreesenseResponse.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/DKSRDomain/TreesenseResponse.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/FrostApi/Endpoints/FrostHttpClient.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/FrostApi/Models/Thing/Thing.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/Importer/Constants/Endpoints.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/Importer/Importers/Importer.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/Importer/Importers/ParkingLotImporter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/Importer/Importers/ParkingLotImporter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///run/media/joren/Data/Elie/Mainz-DKSR-importer/Importer/Mappers.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -75,7 +53,7 @@
     "Docker.docker-compose.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "elie-master",
+    "git-widget-placeholder": "master",
     "last_opened_file_path": "/run/media/joren/Data/Elie/Mainz-DKSR-importer/.github/workflows/dotnet.yml",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -93,7 +71,7 @@
     ]
   }
 }]]></component>
-  <component name="RunManager" selected=".NET Project.Importer">
+  <component name="RunManager" selected="Docker.docker-compose">
     <configuration name="Importer" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/Importer/bin/Debug/net8.0/Importer" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -160,7 +138,7 @@
       <updated>1703023081360</updated>
       <workItem from="1703023085044" duration="2366000" />
       <workItem from="1703026028908" duration="6754000" />
-      <workItem from="1703085232145" duration="1489000" />
+      <workItem from="1703085232145" duration="2232000" />
     </task>
     <task id="LOCAL-00001" summary="add docker and set to run every minute">
       <option name="closed" value="true" />
@@ -242,7 +220,23 @@
       <option name="project" value="LOCAL" />
       <updated>1703085701073</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="code cleanup">
+      <option name="closed" value="true" />
+      <created>1703086800990</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1703086800990</updated>
+    </task>
+    <task id="LOCAL-00012" summary="implement env variables">
+      <option name="closed" value="true" />
+      <created>1703086819084</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1703086819084</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -261,6 +255,8 @@
     <MESSAGE value="update docs" />
     <MESSAGE value="add support for string id's" />
     <MESSAGE value="update github action for portainer" />
-    <option name="LAST_COMMIT_MESSAGE" value="update github action for portainer" />
+    <MESSAGE value="code cleanup" />
+    <MESSAGE value="implement env variables" />
+    <option name="LAST_COMMIT_MESSAGE" value="implement env variables" />
   </component>
 </project>
