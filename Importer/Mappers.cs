@@ -21,7 +21,7 @@ public static class Mappers
     {
         var properties = new Dictionary<string, string>
         {
-            { "Id", parkingLot.Sid }, { "ParkingSpaceId", parkingLot.ParkingSpaceId.ToString() },
+            { "Id", parkingLot.Sid}, { "ParkingSpaceId", parkingLot.ParkingSpaceId.ToString() },
             { "ParkingLotId", parkingLot.ParkingLotId.ToString() }
         };
 

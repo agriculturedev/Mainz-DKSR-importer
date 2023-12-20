@@ -303,7 +303,12 @@ public abstract class Importer
 
     protected Task<GetThingsResponse> GetFrostThingData(int id)
     {
-        return _frostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/id eq '{id}'");
+        return _frostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/Id eq '{id}'");
+    }
+    
+    protected Task<GetThingsResponse> GetFrostThingData(string id)
+    {
+        return _frostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/Id eq '{id}'");
     }
 
     private Task<GetDataStreamsResponse?> GetFrostDataStreamData(int thingId)

@@ -24,18 +24,21 @@ public class ParkingLotImporter : Importer
             foreach (var dksrParkingLot in data.SensorData)
                 try
                 {
-                    Thing parkingLot;
-                    var frostParkingLot = await GetFrostThingData(dksrParkingLot.ParkingSpaceId);
-                    if (frostParkingLot.Value.Count == 0)
+                    Thing thing;
+                    var frostThing = await GetFrostThingData(dksrParkingLot.Sid);
+                    if (frostThing.Value.Count == 0)
                     {
-                        parkingLot = Mappers.MapDksrResponse(dksrParkingLot, DataType);
-                        await CreateNewThing(parkingLot);
-                        frostParkingLot = await GetFrostThingData(dksrParkingLot.ParkingSpaceId);
+                        thing = Mappers.MapDksrResponse(dksrParkingLot, DataType);
+                        await CreateNewThing(thing);
+                        frostThing = await GetFrostThingData(dksrParkingLot.Sid);
                     }
+                    
+                    if (frostThing.Value.Count < 1)
+                        throw new Exception($"Creating new thing with id {dksrParkingLot.Sid} seems to have failed...");
 
-                    parkingLot = Mappers.MapDksrResponse(dksrParkingLot, DataType);
-                    parkingLot.Id = frostParkingLot.Value.First().Id;
-                    await Update(parkingLot);
+                    thing = Mappers.MapDksrResponse(dksrParkingLot, DataType);
+                    thing.Id = frostThing.Value.First().Id;
+                    await Update(thing);
                 }
                 catch (Exception e)
                 {

@@ -22,16 +22,20 @@ public class TreeImporter : Importer
             Logger.LogInformation($"Updating {DataType} Data...");
             var data = await GetDksrData();
             foreach (var dksrTree in data.SensorData)
+            {
                 try
                 {
                     Thing thing;
-                    var frostThing = await GetFrostThingData(int.Parse(dksrTree.Id));
+                    var frostThing = await GetFrostThingData(dksrTree.Sid);
                     if (frostThing.Value.Count == 0)
                     {
                         thing = Mappers.MapDksrResponse(dksrTree, DataType);
                         await CreateNewThing(thing);
-                        frostThing = await GetFrostThingData(int.Parse(dksrTree.Id));
+                        frostThing = await GetFrostThingData(dksrTree.Sid);
                     }
+
+                    if (frostThing.Value.Count < 1)
+                        throw new Exception($"Creating new thing with id {dksrTree.Sid} seems to have failed...");
 
                     thing = Mappers.MapDksrResponse(dksrTree, DataType);
                     thing.Id = frostThing.Value.First().Id;
@@ -41,6 +45,8 @@ public class TreeImporter : Importer
                 {
                     Logger.LogError(e.ToString());
                 }
+            }
+
         }
         catch (Exception e)
         {
