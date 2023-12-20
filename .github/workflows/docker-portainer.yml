@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: Joren-vanGoethem/importer
+  IMAGE_NAME: agriculturedev/dksr-importer
 
 jobs:
   build-and-push-image:
