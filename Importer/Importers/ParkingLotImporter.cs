@@ -1,7 +1,6 @@
 using DKSRDomain;
 using FrostApi.Models.Thing;
 using Importer.Constants;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
@@ -10,11 +9,11 @@ public class ParkingLotImporter : Importer
 {
     private Timer _importerTimer;
 
-    public ParkingLotImporter(ILogger logger, IConfiguration config) : base(logger, config, "ParkingLot", "Occupancy")
+    public ParkingLotImporter(ILogger logger) : base(logger, "ParkingLot", "Occupancy")
     {
-        _importerTimer = new Timer(Import, null, 0, 60 * 1000); // every minute
+        _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 2); // every 2 minutes
     }
-    
+
     protected override async void Import(object? _) // object? required for running in a timer
     {
         try
@@ -32,7 +31,7 @@ public class ParkingLotImporter : Importer
                         await CreateNewThing(thing);
                         frostThing = await GetFrostThingData(dksrParkingLot.Sid);
                     }
-                    
+
                     if (frostThing.Value.Count < 1)
                         throw new Exception($"Creating new thing with id {dksrParkingLot.Sid} seems to have failed...");
 

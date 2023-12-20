@@ -10,7 +10,6 @@ using FrostApi.ResponseModels.DataStream;
 using FrostApi.ResponseModels.ObservedProperty;
 using FrostApi.ResponseModels.Sensor;
 using FrostApi.ResponseModels.Thing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
@@ -18,21 +17,22 @@ namespace Importer.Importers;
 public abstract class Importer
 {
     private readonly string _dataStreamName;
+    private readonly FrostApi.FrostApi _frostApi;
     protected readonly HttpClient Client;
     protected readonly string DataType;
-    private readonly FrostApi.FrostApi _frostApi;
     protected readonly ILogger Logger;
 
-    protected Importer(ILogger logger, IConfiguration config, string dataType, string dataStreamName)
+    protected Importer(ILogger logger, string dataType, string dataStreamName)
     {
-        _frostApi = new FrostApi.FrostApi(config["FrostBaseUrl"] ?? throw new ArgumentNullException("FrostBaseUrl"));
-        Username = config["Authentication:Username"] ?? throw new ArgumentNullException("Username");
-        Password = config["Authentication:Password"] ?? throw new ArgumentNullException("Password");
+        _frostApi = new FrostApi.FrostApi(Environment.GetEnvironmentVariable("FROST_SERVER_BASE_URL") ??
+                                          throw new Exception("FROST_SERVER_BASE_URL not set"));
+        Username = Environment.GetEnvironmentVariable("DKSR_HISTORIC_USERNAME") ?? throw new Exception("DKSR_HISTORIC_USERNAME not set");
+        Password = Environment.GetEnvironmentVariable("DKSR_HISTORIC_PASSWORD") ?? throw new Exception("DKSR_HISTORIC_PASSWORD not set");
         Client = SetupHttpClient();
         Logger = logger;
         DataType = dataType;
         _dataStreamName = dataStreamName;
-        
+
         Logger.LogInformation($"Starting {DataType} Sensor Data Collection");
     }
 
@@ -68,6 +68,7 @@ public abstract class Importer
             Logger.LogError($"{DataType} {thing.Name} with Id {thing.Properties["Id"]} could not be created");
         return Task.CompletedTask;
     }
+
     protected async Task Update(Thing thing)
     {
         Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Id} found in Frost, updating...");
@@ -90,7 +91,7 @@ public abstract class Importer
         }
     }
 
-    
+
     private async Task CreateLocationIfNotExists(Thing thing)
     {
         var locations = await _frostApi.Locations.GetLocationsForThing(thing.Id);
@@ -106,6 +107,7 @@ public abstract class Importer
             }
         }
     }
+
     private async Task CreateNewLocation(Thing thing)
     {
         var location = new ThingLocation
@@ -174,6 +176,7 @@ public abstract class Importer
 
         return sensorResponse;
     }
+
     private async Task CreateNewSensor(Sensor sensor)
     {
         var response = await _frostApi.Sensors.PostSensor(sensor);
@@ -210,6 +213,7 @@ public abstract class Importer
 
         return healthStateObservedPropertyResponse;
     }
+
     private async Task CreateNewObservedProperty(ObservedProperty observedProperty)
     {
         var response = await _frostApi.ObservedProperties.PostObservedProperty(observedProperty);
@@ -221,7 +225,7 @@ public abstract class Importer
                 $"ObservedProperty {observedProperty.Name} with Id {observedProperty.Id} could not be created");
     }
 
-    
+
     private async Task AddObservation(Thing thing, DataStream dataStream)
     {
         var observations = await _frostApi.Observations.GetObservationsForDataStream(dataStream.Id);
@@ -248,8 +252,8 @@ public abstract class Importer
             Logger.LogError(response.Content.ReadAsStringAsync().Result);
         }
     }
-    
-    
+
+
     private async Task<GetDataStreamsResponse> GetOrCreateDataStream(Thing thing)
     {
         var dataStreams = await GetFrostDataStreamData(thing.Id);
@@ -267,6 +271,7 @@ public abstract class Importer
 
         return dataStreams;
     }
+
     private async Task CreateNewDataStream(Thing thing)
     {
         var observedPropertyResponse = await GetOrCreateObservedProperty();
@@ -305,7 +310,7 @@ public abstract class Importer
     {
         return _frostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/Id eq '{id}'");
     }
-    
+
     protected Task<GetThingsResponse> GetFrostThingData(string id)
     {
         return _frostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/Id eq '{id}'");

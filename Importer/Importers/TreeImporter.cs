@@ -1,7 +1,6 @@
 using DKSRDomain;
 using FrostApi.Models.Thing;
 using Importer.Constants;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
@@ -10,9 +9,9 @@ public class TreeImporter : Importer
 {
     private Timer _importerTimer;
 
-    public TreeImporter(ILogger logger, IConfiguration config) : base(logger, config, "Tree", "HealthState")
+    public TreeImporter(ILogger logger) : base(logger, "Tree", "HealthState")
     {
-        _importerTimer = new Timer(Import, null, 0, 60 * 1000); // every minute
+        _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 60); // every hour
     }
 
     protected override async void Import(object? _)
@@ -22,7 +21,6 @@ public class TreeImporter : Importer
             Logger.LogInformation($"Updating {DataType} Data...");
             var data = await GetDksrData();
             foreach (var dksrTree in data.SensorData)
-            {
                 try
                 {
                     Thing thing;
@@ -45,8 +43,6 @@ public class TreeImporter : Importer
                 {
                     Logger.LogError(e.ToString());
                 }
-            }
-
         }
         catch (Exception e)
         {

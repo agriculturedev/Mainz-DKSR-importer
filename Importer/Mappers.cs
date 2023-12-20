@@ -11,22 +11,22 @@ public static class Mappers
     public static Thing MapDksrResponse(TreeSenseSensorData treeData, string dataType)
     {
         var properties = new Dictionary<string, string> { { "Id", treeData.Sid } };
-        
+
         var observation = new Observation { Result = treeData.HealthState, PhenomenonTime = treeData.Timestamp };
-        
+
         return Thing.Create(dataType, treeData.Sid, properties, treeData.Lat, treeData.Lng, observation);
     }
-    
+
     public static Thing MapDksrResponse(ParkingLotSensorData parkingLot, string dataType)
     {
         var properties = new Dictionary<string, string>
         {
-            { "Id", parkingLot.Sid}, { "ParkingSpaceId", parkingLot.ParkingSpaceId.ToString() },
+            { "Id", parkingLot.Sid }, { "ParkingSpaceId", parkingLot.ParkingSpaceId.ToString() },
             { "ParkingLotId", parkingLot.ParkingLotId.ToString() }
         };
 
         var observation = new Observation { Result = parkingLot.Occupied, PhenomenonTime = parkingLot.Timestamp };
-        
+
         return Thing.Create(dataType, parkingLot.Sid, properties, parkingLot.Lat, parkingLot.Lon, observation);
     }
 

@@ -53,9 +53,9 @@ jobs:
     steps:
       - name: Call Webhooks for Portainer redeployment
         run: |
-            IFS=',' read -ra WEBHOOKS <<< "${WEBHOOK_URLS}"
-            for webhook in "${WEBHOOKS[@]}"; do
-            curl -X POST "$webhook"
-            done
+          IFS=',' read -ra WEBHOOKS <<< "${WEBHOOK_URLS}"
+          for webhook in "${WEBHOOKS[@]}"; do
+          curl -X POST "$webhook"
+          done
         env:
-            WEBHOOK_URLS: ${{ secrets.WEBHOOK_URL }}
+          WEBHOOK_URLS: ${{ secrets.WEBHOOK_URL }}
