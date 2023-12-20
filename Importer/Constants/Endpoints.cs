@@ -16,7 +16,7 @@ public static class Endpoints
         // if username or password is null, return the unauthenticated endpoint
         if (username == null || password == null)
             throw new ArgumentException("username or password undefined");
-        
+
         return $"{Prefix}{username}:{password}@{Url}{socket}";
     }
 

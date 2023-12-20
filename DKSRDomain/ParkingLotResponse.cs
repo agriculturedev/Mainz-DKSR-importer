@@ -31,60 +31,39 @@ public class ParkingLotResponse
 
 public class ParkingLotSensorData
 {
-    [JsonProperty("ignored")]
-    public bool Ignored { get; set; }
-    
-    [JsonProperty("parking_space_id")]
-    public int ParkingSpaceId { get; set; }
-    
-    [JsonProperty("level")]
-    public int Level { get; set; }
-    
-    [JsonProperty("last_change")]
-    public int LastChange { get; set; }
-    
-    [JsonProperty("occupied_preliminary")]
-    public bool OccupiedPreliminary { get; set; }
-    
-    [JsonProperty("lon")]
-    public double Lon { get; set; }
-    
-    [JsonProperty("SID")]
-    public string Sid { get; set; }
-    
-    [JsonProperty("sensor_id")]
-    public int SensorId { get; set; }
-    
-    [JsonProperty("had_display")]
-    public bool HasDisplay { get; set; }
-    
-    [JsonProperty("additional_info")]
-    public string AdditionalInfo { get; set; }
-    
-    [JsonProperty("reserved")]
-    public bool Reserved { get; set; }
-    
-    [JsonProperty("last_contact")]
-    public int LastContact { get; set; }
-    
-    [JsonProperty("xml_id")]
-    public int XmlId { get; set; }
-    
-    [JsonProperty("parking_lot_id")]
-    public int ParkingLotId { get; set; }
-    
-    [JsonProperty("occupied")]
-    public bool Occupied { get; set; }
-    
-    [JsonProperty("lat")]
-    public double Lat { get; set; }
-    
-    [JsonProperty("timestamp")]
+    [JsonProperty("ignored")] public bool Ignored { get; set; }
 
-    public DateTime Timestamp { get; set; }
-    
-    [JsonProperty("_headers")]
+    [JsonProperty("parking_space_id")] public int ParkingSpaceId { get; set; }
 
-    public Dictionary<string, string> Headers { get; set; }
-    
+    [JsonProperty("level")] public int Level { get; set; }
+
+    [JsonProperty("last_change")] public int LastChange { get; set; }
+
+    [JsonProperty("occupied_preliminary")] public bool OccupiedPreliminary { get; set; }
+
+    [JsonProperty("lon")] public double Lon { get; set; }
+
+    [JsonProperty("SID")] public string Sid { get; set; }
+
+    [JsonProperty("sensor_id")] public int SensorId { get; set; }
+
+    [JsonProperty("had_display")] public bool HasDisplay { get; set; }
+
+    [JsonProperty("additional_info")] public string AdditionalInfo { get; set; }
+
+    [JsonProperty("reserved")] public bool Reserved { get; set; }
+
+    [JsonProperty("last_contact")] public int LastContact { get; set; }
+
+    [JsonProperty("xml_id")] public int XmlId { get; set; }
+
+    [JsonProperty("parking_lot_id")] public int ParkingLotId { get; set; }
+
+    [JsonProperty("occupied")] public bool Occupied { get; set; }
+
+    [JsonProperty("lat")] public double Lat { get; set; }
+
+    [JsonProperty("timestamp")] public DateTime Timestamp { get; set; }
+
+    [JsonProperty("_headers")] public Dictionary<string, string> Headers { get; set; }
 }

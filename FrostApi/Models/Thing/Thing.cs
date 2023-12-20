@@ -11,7 +11,7 @@ public class Thing
     [JsonProperty("properties")]
     [JsonRequired]
     public Dictionary<string, string> Properties { get; private set; }
-    
+
     [JsonIgnore] public double Lat { get; private set; }
     [JsonIgnore] public double Lon { get; private set; }
     [JsonIgnore] public Observation.Observation LatestObservation { get; private set; }
@@ -21,7 +21,7 @@ public class Thing
     {
         if (!properties.ContainsKey("Id"))
             throw new ArgumentException("Properties must contain a key 'Id'");
-        
+
         return new Thing
         {
             Description = description,
@@ -32,7 +32,7 @@ public class Thing
             LatestObservation = latestObservation
         };
     }
-    
+
     public static Thing Create(string name, string description, Dictionary<string, string> properties, string lat,
         string lon, Observation.Observation latestObservation)
     {
