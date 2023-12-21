@@ -18,7 +18,7 @@ public class ParkingLotImporter : Importer
     {
         try
         {
-            Logger.LogInformation($"Updating {DataType} Data...");
+            Logger.LogInformation($"{DateTime.Now} - Updating {DataType} Data...");
             var data = await GetDksrData();
             foreach (var dksrParkingLot in data.SensorData)
                 try
@@ -41,21 +41,29 @@ public class ParkingLotImporter : Importer
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.ToString());
+                    Logger.LogError($"{DateTime.Now} - {e}");
                 }
         }
         catch (Exception e)
         {
-            Logger.LogError(e.ToString());
+            Logger.LogError($"{DateTime.Now} - {e}");
         }
     }
 
     private async Task<ParkingLotResponse> GetDksrData()
     {
-        var response =
-            await Client.GetAsync(
-                Endpoints.GetAuthenticatedEndpointUrl(Username, Password, Endpoints.ParkingLotEndpoint));
-        var result = await response.Content.ReadAsAsync<ParkingLotResponse>();
-        return result;
+        try
+        {
+            var response =
+                await Client.GetAsync(
+                    Endpoints.GetAuthenticatedEndpointUrl(Username, Password, Endpoints.ParkingLotEndpoint));
+            var result = await response.Content.ReadAsAsync<ParkingLotResponse>();
+            return result;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Getting data from DKSR failed, returning empty response");
+            throw new Exception($"{DateTime.Now} - {e}");
+        }
     }
 }

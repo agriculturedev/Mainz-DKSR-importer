@@ -18,7 +18,7 @@ public class TreeImporter : Importer
     {
         try
         {
-            Logger.LogInformation($"Updating {DataType} Data...");
+            Logger.LogInformation($"{DateTime.Now} - Updating {DataType} Data...");
             var data = await GetDksrData();
             foreach (var dksrTree in data.SensorData)
                 try
@@ -41,22 +41,30 @@ public class TreeImporter : Importer
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.ToString());
+                    Logger.LogError($"{DateTime.Now} - {e}");
                 }
         }
         catch (Exception e)
         {
-            Logger.LogError(e.ToString());
+            Logger.LogError($"{DateTime.Now} - {e}");
         }
     }
 
 
     private async Task<TreesenseResponse> GetDksrData()
     {
-        var response =
-            await Client.GetAsync(
-                Endpoints.GetAuthenticatedEndpointUrl(Username, Password, Endpoints.TreesenseEndpoint));
-        var result = await response.Content.ReadAsAsync<TreesenseResponse>();
-        return result;
+        try
+        {
+            var response =
+                await Client.GetAsync(
+                    Endpoints.GetAuthenticatedEndpointUrl(Username, Password, Endpoints.TreesenseEndpoint));
+            var result = await response.Content.ReadAsAsync<TreesenseResponse>();
+            return result;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Getting data from DKSR failed, returning empty response");
+            throw new Exception($"{DateTime.Now} - {e}");
+        }
     }
 }

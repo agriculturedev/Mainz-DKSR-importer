@@ -33,7 +33,7 @@ public abstract class Importer
         DataType = dataType;
         _dataStreamName = dataStreamName;
 
-        Logger.LogInformation($"Starting {DataType} Sensor Data Collection");
+        Logger.LogInformation($"{DateTime.Now} - Starting {DataType} Sensor Data Collection");
     }
 
     protected static string? Username { get; set; }
