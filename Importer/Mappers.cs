@@ -14,7 +14,7 @@ public static class Mappers
 
         var observation = new Observation { Result = treeData.HealthState, PhenomenonTime = treeData.Timestamp };
 
-        return Thing.Create($"{dataType}{treeData.Sid}", dataType, properties, treeData.Lat, treeData.Lng, observation);
+        return Thing.Create($"{dataType}-{treeData.Sid}", dataType, properties, treeData.Lat, treeData.Lng, observation);
     }
 
     public static Thing MapDksrResponse(ParkingLotSensorData parkingLot, string dataType)
@@ -27,7 +27,7 @@ public static class Mappers
 
         var observation = new Observation { Result = parkingLot.Occupied, PhenomenonTime = parkingLot.Timestamp };
 
-        return Thing.Create($"{dataType}{parkingLot.Sid}", dataType, properties, parkingLot.Lat, parkingLot.Lon, observation);
+        return Thing.Create($"{dataType}-{parkingLot.Sid}", dataType, properties, parkingLot.Lat, parkingLot.Lon, observation);
     }
 
     public static DataStream MapFrostResponseToDataStream(DataStreamResponse? response)

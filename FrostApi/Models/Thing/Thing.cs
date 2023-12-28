@@ -24,8 +24,8 @@ public class Thing
 
         return new Thing
         {
-            Description = description,
             Name = name,
+            Description = description,
             Properties = properties,
             Lat = lat,
             Lon = lon,
