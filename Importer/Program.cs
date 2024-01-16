@@ -17,7 +17,7 @@ internal class Program
         _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
         var treeImporter = new TreeImporter(_logger);
-        var parkingLotImporter = new ParkingLotImporter(_logger);
+        var parkingSpaceImporter = new ParkingSpaceImporter(_logger);
 
         Process.GetCurrentProcess().WaitForExit();
     }

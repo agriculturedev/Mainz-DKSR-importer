@@ -17,17 +17,18 @@ public static class Mappers
         return Thing.Create($"{dataType}-{treeData.Sid}", dataType, properties, treeData.Lat, treeData.Lng, observation);
     }
 
-    public static Thing MapDksrResponse(ParkingLotSensorData parkingLot, string dataType)
+    public static Thing MapDksrResponse(ParkingSpaceSensorData parkingSpace, string dataType)
     {
         var properties = new Dictionary<string, string>
         {
-            { "Id", parkingLot.Sid }, { "ParkingSpaceId", parkingLot.ParkingSpaceId.ToString() },
-            { "ParkingLotId", parkingLot.ParkingLotId.ToString() }
+            { "Id", parkingSpace.Sid }, 
+            { "ParkingSpaceId", parkingSpace.ParkingSpaceId.ToString() },
+            { "ParkingLotId", parkingSpace.ParkingLotId.ToString() }
         };
 
-        var observation = new Observation { Result = parkingLot.Occupied, PhenomenonTime = parkingLot.Timestamp };
+        var observation = new Observation { Result = parkingSpace.Occupied, PhenomenonTime = parkingSpace.Timestamp };
 
-        return Thing.Create($"{dataType}-{parkingLot.Sid}", dataType, properties, parkingLot.Lat, parkingLot.Lon, observation);
+        return Thing.Create($"{dataType}-{parkingSpace.Sid}", dataType, properties, parkingSpace.Lat, parkingSpace.Lon, observation);
     }
 
     public static DataStream MapFrostResponseToDataStream(DataStreamResponse? response)

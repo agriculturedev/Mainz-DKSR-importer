@@ -8,7 +8,7 @@ public static class Endpoints
     public const string TreesenseEndpoint =
         "/UrbanPulseData/historic/sensordata?eventtype=fac3edb2-53fa-4319-a897-e3e3c02102cc";
 
-    public const string ParkingLotEndpoint =
+    public const string ParkingSpaceEndpoint =
         "/UrbanPulseData/historic/sensordata?eventtype=2a4ce3e9-92db-455e-bece-0176c62fafba";
 
     public static string GetAuthenticatedEndpointUrl(string? username, string? password, string socket)

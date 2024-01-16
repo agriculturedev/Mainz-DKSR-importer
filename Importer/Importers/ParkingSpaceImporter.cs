@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
 
-public class ParkingLotImporter : Importer
+public class ParkingSpaceImporter : Importer
 {
     private Timer _importerTimer;
 
-    public ParkingLotImporter(ILogger logger) : base(logger, "ParkingLot", "Occupancy")
+    public ParkingSpaceImporter(ILogger logger) : base(logger, "ParkingSpace", "Occupancy")
     {
         _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 2); // every 2 minutes
     }
@@ -20,22 +20,22 @@ public class ParkingLotImporter : Importer
         {
             Logger.LogInformation($"{DateTime.Now} - Updating {DataType} Data...");
             var data = await GetDksrData();
-            foreach (var dksrParkingLot in data.SensorData)
+            foreach (var parkingSpace in data.SensorData)
                 try
                 {
                     Thing thing;
-                    var frostThing = await GetFrostThingData(dksrParkingLot.Sid);
+                    var frostThing = await GetFrostThingData(parkingSpace.Sid);
                     if (frostThing.Value.Count == 0)
                     {
-                        thing = Mappers.MapDksrResponse(dksrParkingLot, DataType);
+                        thing = Mappers.MapDksrResponse(parkingSpace, DataType);
                         await CreateNewThing(thing);
-                        frostThing = await GetFrostThingData(dksrParkingLot.Sid);
+                        frostThing = await GetFrostThingData(parkingSpace.Sid);
                     }
 
                     if (frostThing.Value.Count < 1)
-                        throw new Exception($"Creating new thing with id {dksrParkingLot.Sid} seems to have failed...");
+                        throw new Exception($"Creating new thing with id {parkingSpace.Sid} seems to have failed...");
 
-                    thing = Mappers.MapDksrResponse(dksrParkingLot, DataType);
+                    thing = Mappers.MapDksrResponse(parkingSpace, DataType);
                     thing.Id = frostThing.Value.First().Id;
                     await Update(thing);
                 }
@@ -50,14 +50,14 @@ public class ParkingLotImporter : Importer
         }
     }
 
-    private async Task<ParkingLotResponse> GetDksrData()
+    private async Task<ParkingSpaceResponse> GetDksrData()
     {
         try
         {
             var response =
                 await Client.GetAsync(
-                    Endpoints.GetAuthenticatedEndpointUrl(Username, Password, Endpoints.ParkingLotEndpoint));
-            var result = await response.Content.ReadAsAsync<ParkingLotResponse>();
+                    Endpoints.GetAuthenticatedEndpointUrl(Username, Password, Endpoints.ParkingSpaceEndpoint));
+            var result = await response.Content.ReadAsAsync<ParkingSpaceResponse>();
             return result;
         }
         catch (Exception e)

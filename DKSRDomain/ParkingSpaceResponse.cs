@@ -2,9 +2,9 @@ using Newtonsoft.Json;
 
 namespace DKSRDomain;
 
-public class ParkingLotResponse
+public class ParkingSpaceResponse
 {
-    public ParkingLotSensorData[] SensorData { get; set; }
+    public ParkingSpaceSensorData[] SensorData { get; set; }
 }
 
 //   {
@@ -29,7 +29,7 @@ public class ParkingLotResponse
 //       "eventType": "ParkinglotSNEventType"
 //     }
 
-public class ParkingLotSensorData
+public class ParkingSpaceSensorData
 {
     [JsonProperty("ignored")] public bool Ignored { get; set; }
 
