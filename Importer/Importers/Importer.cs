@@ -24,10 +24,21 @@ public abstract class Importer
 
     protected Importer(ILogger logger, string dataType, string dataStreamName)
     {
-        _frostApi = new FrostApi.FrostApi(Environment.GetEnvironmentVariable("FROST_SERVER_BASE_URL") ??
-                                          throw new Exception("FROST_SERVER_BASE_URL not set"));
-        Username = Environment.GetEnvironmentVariable("DKSR_HISTORIC_USERNAME") ?? throw new Exception("DKSR_HISTORIC_USERNAME not set");
-        Password = Environment.GetEnvironmentVariable("DKSR_HISTORIC_PASSWORD") ?? throw new Exception("DKSR_HISTORIC_PASSWORD not set");
+        // _frostApi = new FrostApi.FrostApi(Environment.GetEnvironmentVariable("FROST_SERVER_BASE_URL") ??
+        //                                   throw new Exception("FROST_SERVER_BASE_URL not set"));
+        //
+        // Username = Environment.GetEnvironmentVariable("DKSR_HISTORIC_USERNAME") ?? throw new Exception("DKSR_HISTORIC_USERNAME not set");
+        // Password = Environment.GetEnvironmentVariable("DKSR_HISTORIC_PASSWORD") ?? throw new Exception("DKSR_HISTORIC_PASSWORD not set");
+        // Client = SetupHttpClient();
+        // Logger = logger;
+        // DataType = dataType;
+        // _dataStreamName = dataStreamName;
+        
+        _frostApi = new FrostApi.FrostApi(Environment.GetEnvironmentVariable("FROST_SERVER_BASE_URL_WEATHER") ??
+                                          throw new Exception("FROST_SERVER_BASE_URL_WEATHER not set"));
+        
+        Username = Environment.GetEnvironmentVariable("DKSR_HISTORIC_USERNAME_WEATHER") ?? throw new Exception("DKSR_HISTORIC_USERNAME_WEATHER not set");
+        Password = Environment.GetEnvironmentVariable("DKSR_HISTORIC_PASSWORD_WEATHER") ?? throw new Exception("DKSR_HISTORIC_PASSWORD_WEATHER not set");
         Client = SetupHttpClient();
         Logger = logger;
         DataType = dataType;

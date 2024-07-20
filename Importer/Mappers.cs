@@ -30,6 +30,26 @@ public static class Mappers
 
         return Thing.Create($"{dataType}-{parkingSpace.Sid}", dataType, properties, parkingSpace.Lat, parkingSpace.Lon, observation);
     }
+    
+    public static Thing MapDksrResponse(WeatherSensorData weather, string dataType)
+    {
+        var properties = new Dictionary<string, string>
+        {
+            { "Id", weather.SID }, 
+            { "Temperature", weather.Temp.ToString() },
+            { "Max temperature", weather.TempMax.ToString() },
+            { "Min temperature", weather.TempMin.ToString() },
+            { "Pressure", weather.Pressure.ToString() },
+            { "Humidity", weather.Humidity.ToString() },
+            { "Wind speed", weather.WindSpeed.ToString() },
+            { "Wind direction", weather.WindDeg.ToString() },
+            { "Cloudiness", weather.Clouds.ToString() }
+        };
+
+        var observation = new Observation { Result = weather.Temp, PhenomenonTime = weather.Timestamp };
+
+        return Thing.Create($"{dataType}-{weather.SID}", dataType, properties, weather.Lat, weather.Lon, observation);
+    }
 
     public static DataStream MapFrostResponseToDataStream(DataStreamResponse? response)
     {
