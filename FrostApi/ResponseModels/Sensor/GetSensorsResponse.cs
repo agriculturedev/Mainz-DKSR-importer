@@ -6,5 +6,5 @@ public class GetSensorsResponse
 {
     [JsonProperty("@iot.count")] public int Count { get; set; }
 
-    [JsonProperty("value")] public List<SensorResponse> Value { get; set; }
+    [JsonProperty("value")] public List<SensorResponse> Value { get; set; } = null!;
 }

@@ -4,7 +4,7 @@ namespace DKSRDomain;
 
 public class ParkingSpaceResponse
 {
-    public ParkingSpaceSensorData[] SensorData { get; set; }
+    public ParkingSpaceSensorData[] SensorData { get; set; } = null!;
 }
 
 //   {
@@ -43,13 +43,13 @@ public class ParkingSpaceSensorData
 
     [JsonProperty("lon")] public double Lon { get; set; }
 
-    [JsonProperty("SID")] public string Sid { get; set; }
+    [JsonProperty("SID")] public string Sid { get; set; } = null!;
 
     [JsonProperty("sensor_id")] public int SensorId { get; set; }
 
     [JsonProperty("had_display")] public bool HasDisplay { get; set; }
 
-    [JsonProperty("additional_info")] public string AdditionalInfo { get; set; }
+    [JsonProperty("additional_info")] public string AdditionalInfo { get; set; } = null!;
 
     [JsonProperty("reserved")] public bool Reserved { get; set; }
 
@@ -65,5 +65,5 @@ public class ParkingSpaceSensorData
 
     [JsonProperty("timestamp")] public DateTime Timestamp { get; set; }
 
-    [JsonProperty("_headers")] public Dictionary<string, string> Headers { get; set; }
+    [JsonProperty("_headers")] public Dictionary<string, string> Headers { get; set; } = null!;
 }

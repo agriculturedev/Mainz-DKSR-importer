@@ -4,7 +4,7 @@ namespace DKSRDomain;
 
 public class WeatherResponse
 {
-    public List<WeatherSensorData> SensorData { get; set; }
+    public List<WeatherSensorData> SensorData { get; set; } = null!;
 }
 
 // {
@@ -48,9 +48,9 @@ public class WeatherSensorData
     
     [JsonProperty("visibility")] public int Visibility { get; set; }
     
-    [JsonProperty("city")] public string City { get; set; }
-    
-    [JsonProperty("countrycode")] public string CountryCode { get; set; }
+    [JsonProperty("city")] public string City { get; set; } = null!;
+
+    [JsonProperty("countrycode")] public string CountryCode { get; set; } = null!;
     
     [JsonProperty("lon")] public double Lon { get; set; }
     
@@ -58,13 +58,13 @@ public class WeatherSensorData
     
     [JsonProperty("pressure")] public int Pressure { get; set; }
     
-    [JsonProperty("weather_icon")] public string WeatherIcon { get; set; }
+    [JsonProperty("weather_icon")] public string WeatherIcon { get; set; } = null!;
     
     [JsonProperty("feels_like")] public double FeelsLike { get; set; }
     
     [JsonProperty("temp_max")] public double TempMax { get; set; }
     
-    [JsonProperty("SID")] public string SID { get; set; }
+    [JsonProperty("SID")] public string SID { get; set; } = null!;
     
     [JsonProperty("wind_deg")] public int WindDeg { get; set; }
     
@@ -84,5 +84,5 @@ public class WeatherSensorData
     
     [JsonProperty("timestamp")] public DateTime Timestamp { get; set; }
     
-    [JsonProperty("_headers")] public Dictionary<string, string> Headers { get; set; }
+    [JsonProperty("_headers")] public Dictionary<string, string> Headers { get; set; } = null!;
 }
