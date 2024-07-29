@@ -2,11 +2,6 @@ using Newtonsoft.Json;
 
 namespace DKSRDomain;
 
-public class WeatherResponse
-{
-    public List<WeatherSensorData> SensorData { get; set; } = null!;
-}
-
 // {
 //     "rain": 0,
 //     "weather_id": 800,
@@ -36,7 +31,7 @@ public class WeatherResponse
 //     }
 // }
 
-public class WeatherSensorData
+public class WeatherSensorData : IDksrResponse
 {
     [JsonProperty("rain")] public int Rain { get; set; }
     
@@ -52,36 +47,35 @@ public class WeatherSensorData
 
     [JsonProperty("countrycode")] public string CountryCode { get; set; } = null!;
     
-    [JsonProperty("lon")] public double Lon { get; set; }
-    
+
     [JsonProperty("clouds")] public int Clouds { get; set; }
-    
+
     [JsonProperty("pressure")] public int Pressure { get; set; }
-    
+
     [JsonProperty("weather_icon")] public string WeatherIcon { get; set; } = null!;
-    
+
     [JsonProperty("feels_like")] public double FeelsLike { get; set; }
-    
+
     [JsonProperty("temp_max")] public double TempMax { get; set; }
-    
-    [JsonProperty("SID")] public string SID { get; set; } = null!;
-    
-    [JsonProperty("wind_deg")] public int WindDeg { get; set; }
-    
+
     [JsonProperty("temp_min")] public double TempMin { get; set; }
-    
+
+    [JsonProperty("wind_deg")] public int WindDeg { get; set; }
+
+
     [JsonProperty("grnd_level")] public int GrndLevel { get; set; }
-    
+
     [JsonProperty("sunset")] public DateTime Sunset { get; set; }
-    
+
     [JsonProperty("humidity")] public int Humidity { get; set; }
-    
+
     [JsonProperty("wind_speed")] public double WindSpeed { get; set; }
-    
+
     [JsonProperty("sea_level")] public int SeaLevel { get; set; }
-    
+
+    [JsonProperty("SID")] public string Sid { get; set; } = null!;
     [JsonProperty("lat")] public double Lat { get; set; }
-    
+    [JsonProperty("lon")] public double Lng { get; set; }
     [JsonProperty("timestamp")] public DateTime Timestamp { get; set; }
     
     [JsonProperty("_headers")] public Dictionary<string, string> Headers { get; set; } = null!;

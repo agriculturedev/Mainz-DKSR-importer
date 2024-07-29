@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net;
 using System.Text;
+using DKSRDomain;
 using FrostApi.Models.DataStream;
 using FrostApi.Models.Location;
 using FrostApi.Models.ObservedProperty;
@@ -10,6 +11,8 @@ using FrostApi.ResponseModels.DataStream;
 using FrostApi.ResponseModels.ObservedProperty;
 using FrostApi.ResponseModels.Sensor;
 using FrostApi.ResponseModels.Thing;
+using Importer.Configuration;
+using Importer.Constants;
 using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
@@ -18,27 +21,17 @@ public abstract class Importer
 {
     private readonly string _dataStreamName;
     private readonly FrostApi.FrostApi _frostApi;
-    protected readonly HttpClient Client;
+    private readonly HttpClient Client;
     protected readonly string DataType;
     protected readonly ILogger Logger;
 
-    protected Importer(ILogger logger, string dataType, string dataStreamName)
+    protected Importer(ILogger logger, string dataType, string dataStreamName, DataSource source)
     {
-        // _frostApi = new FrostApi.FrostApi(Environment.GetEnvironmentVariable("FROST_SERVER_BASE_URL") ??
-        //                                   throw new Exception("FROST_SERVER_BASE_URL not set"));
-        //
-        // Username = Environment.GetEnvironmentVariable("DKSR_HISTORIC_USERNAME") ?? throw new Exception("DKSR_HISTORIC_USERNAME not set");
-        // Password = Environment.GetEnvironmentVariable("DKSR_HISTORIC_PASSWORD") ?? throw new Exception("DKSR_HISTORIC_PASSWORD not set");
-        // Client = SetupHttpClient();
-        // Logger = logger;
-        // DataType = dataType;
-        // _dataStreamName = dataStreamName;
-        
-        _frostApi = new FrostApi.FrostApi(Environment.GetEnvironmentVariable("FROST_SERVER_BASE_URL_WEATHER") ??
-                                          throw new Exception("FROST_SERVER_BASE_URL_WEATHER not set"));
-        
-        Username = Environment.GetEnvironmentVariable("DKSR_HISTORIC_USERNAME_WEATHER") ?? throw new Exception("DKSR_HISTORIC_USERNAME_WEATHER not set");
-        Password = Environment.GetEnvironmentVariable("DKSR_HISTORIC_PASSWORD_WEATHER") ?? throw new Exception("DKSR_HISTORIC_PASSWORD_WEATHER not set");
+        _frostApi = new FrostApi.FrostApi(source.DestinationUrl);
+
+        Username = source.Username;
+        Password = source.Password;
+        SourceUrl = source.SourceUrl;
         Client = SetupHttpClient();
         Logger = logger;
         DataType = dataType;
@@ -49,6 +42,7 @@ public abstract class Importer
 
     protected static string? Username { get; set; }
     protected static string? Password { get; set; }
+    protected static string SourceUrl { get; set; } = null!;
 
     private HttpClient SetupHttpClient()
     {
@@ -68,6 +62,41 @@ public abstract class Importer
     }
 
     protected abstract void Import(object? _);
+
+    protected async Task<List<T>> GetDksrData<T>() where T : IDksrResponse
+    {
+        try
+        {
+            var url = Endpoints.GetAuthenticatedEndpointUrl(Username, Password, SourceUrl);
+            var response = await Client.GetAsync(url);
+            var result = await response.Content.ReadAsAsync<List<T>>();
+            return result;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Getting data failed, returning empty response");
+            throw new Exception($"{DateTime.Now} - {e}");
+        }
+    }
+
+    protected async void UpdateThing(Thing thing)
+    {
+        // Thing thing;
+        // thing = Mappers.MapDksrResponse(dksResponse, DataType);
+        var frostThing = await GetFrostThingData(thing.Properties["Id"]);
+
+        if (frostThing.Value.Count == 0)
+        {
+            await CreateNewThing(thing);
+            frostThing = await GetFrostThingData(thing.Properties["Id"]);
+        }
+
+        if (frostThing.Value.Count < 1)
+            throw new Exception($"Creating new thing with id {thing.Properties["Id"]} seems to have failed...");
+
+        thing.Id = frostThing.Value.First().Id;
+        await Update(thing);
+    }
 
     protected Task CreateNewThing(Thing thing)
     {
@@ -315,11 +344,6 @@ public abstract class Importer
             Logger.LogDebug($"Datastream {dataStream.Name} created successfully");
         else
             Logger.LogError($"Datastream {dataStream.Name} could not be created");
-    }
-
-    protected Task<GetThingsResponse> GetFrostThingData(int id)
-    {
-        return _frostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/Id eq '{id}'");
     }
 
     protected Task<GetThingsResponse> GetFrostThingData(string id)

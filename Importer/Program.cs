@@ -16,13 +16,36 @@ internal class Program
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
-        // var treeImporter = new TreeImporter(_logger);
-        // var parkingSpaceImporter = new ParkingSpaceImporter(_logger);
-        var weatherImporter = new WeatherImporter(_logger);
+        var importers = new List<Importers.Importer>();
+
+        foreach (var source in ConfigurationManager.Sources.Sources)
+        {
+            _logger.LogInformation($"Importing {source.ImporterType}...");
+            switch (source.ImporterType.ToLower())
+            {
+                case "tree":
+                    var treeImporter = new TreeImporter(_logger, source);
+                    importers.Add(treeImporter);
+                    break;
+                case "parkingspace":
+                    var parkingSpaceImporter = new ParkingSpaceImporter(_logger, source);
+                    importers.Add(parkingSpaceImporter);
+                    break;
+                case "weather":
+                    var weatherImporter = new WeatherImporter(_logger, source);
+                    importers.Add(weatherImporter);
+                    break;
+                default:
+                    _logger.LogWarning($"Unknown source: {source.ImporterType}");
+                    break;
+            }
+        }
+
+
+        Console.WriteLine($"active importers: {importers.Count()}");
 
         Process.GetCurrentProcess().WaitForExit();
     }
-
     private static void ConfigureServices(IServiceCollection services)
     {
         services
