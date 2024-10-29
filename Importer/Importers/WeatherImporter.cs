@@ -45,7 +45,6 @@ public class WeatherImporter : Importer
         {
             var url = Endpoints.GetAuthenticatedEndpointUrl(Username, Password, SourceUrl);
             var response = await Client.GetAsync(url);
-            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
             var result = await response.Content.ReadAsAsync<WeatherSensorDataWrapper>();
             return result.SensorData.ToList();
         }
