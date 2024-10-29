@@ -21,7 +21,7 @@ public abstract class Importer
 {
     private readonly string _dataStreamName;
     private readonly FrostApi.FrostApi _frostApi;
-    private readonly HttpClient Client;
+    protected readonly HttpClient Client;
     protected readonly string DataType;
     protected readonly ILogger Logger;
 
