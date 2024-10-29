@@ -158,7 +158,7 @@ public abstract class Importer
             Location = new LocationProperties
             {
                 Type = "Point",
-                Coordinates = new List<string> { thing.Lon.ToString(CultureInfo.InvariantCulture), thing.Lat.ToString(CultureInfo.InvariantCulture) }
+                Coordinates = new List<double> { thing.Lon, thing.Lat }
             },
             Things = new List<Dictionary<string, string>> { new() { { "@iot.id", thing.Id.ToString() } } }
         };
