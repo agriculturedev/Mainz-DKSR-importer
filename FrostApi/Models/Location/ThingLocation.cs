@@ -6,13 +6,13 @@ public class ThingLocation
 {
     [JsonProperty("id")] public int Id { get; set; }
 
-    [JsonProperty("name")] public string Name { get; set; }
+    [JsonProperty("name")] public string Name { get; set; } = null!;
 
-    [JsonProperty("description")] public string Description { get; set; }
+    [JsonProperty("description")] public string Description { get; set; } = null!;
 
-    [JsonProperty("encodingType")] public string EncodingType { get; set; }
+    [JsonProperty("encodingType")] public string EncodingType { get; set; } = null!;
 
-    [JsonProperty("location")] public LocationProperties Location { get; set; }
+    [JsonProperty("location")] public LocationProperties Location { get; set; } = null!;
 
-    public IList<Dictionary<string, string>> Things { get; set; }
+    public IList<Dictionary<string, string>> Things { get; set; } = null!;
 }

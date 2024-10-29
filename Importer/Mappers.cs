@@ -28,14 +28,14 @@ public static class Mappers
 
         var observation = new Observation { Result = parkingSpace.Occupied, PhenomenonTime = parkingSpace.Timestamp };
 
-        return Thing.Create($"{dataType}-{parkingSpace.Sid}", dataType, properties, parkingSpace.Lat, parkingSpace.Lon, observation);
+        return Thing.Create($"{dataType}-{parkingSpace.Sid}", dataType, properties, parkingSpace.Lat, parkingSpace.Lng, observation);
     }
     
     public static Thing MapDksrResponse(WeatherSensorData weather, string dataType)
     {
         var properties = new Dictionary<string, string>
         {
-            { "Id", weather.SID }, 
+            { "Id", weather.Sid }, 
             { "Temperature", weather.Temp.ToString() },
             { "Max temperature", weather.TempMax.ToString() },
             { "Min temperature", weather.TempMin.ToString() },
@@ -48,11 +48,16 @@ public static class Mappers
 
         var observation = new Observation { Result = weather.Temp, PhenomenonTime = weather.Timestamp };
 
-        return Thing.Create($"{dataType}-{weather.SID}", dataType, properties, weather.Lat, weather.Lon, observation);
+        return Thing.Create($"{dataType}-{weather.Sid}", dataType, properties, weather.Lat, weather.Lng, observation);
     }
 
     public static DataStream MapFrostResponseToDataStream(DataStreamResponse? response)
     {
+        if (response == null)
+        {
+            return new DataStream();
+        }
+
         var datastream = new DataStream
         {
             Id = response.Id,

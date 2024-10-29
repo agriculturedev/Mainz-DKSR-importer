@@ -1,5 +1,5 @@
 using DKSRDomain;
-using FrostApi.Models.Thing;
+using Importer.Configuration;
 using Importer.Constants;
 using Microsoft.Extensions.Logging;
 
@@ -9,7 +9,7 @@ public class WeatherImporter : Importer
 {
     private Timer _importerTimer;
 
-    public WeatherImporter(ILogger logger) : base(logger, "Weather", "weather")
+    public WeatherImporter(ILogger logger, DataSource dataSource) : base(logger, "Weather", "weather", dataSource)
     {
         _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 60); // every hour
     }
@@ -19,30 +19,19 @@ public class WeatherImporter : Importer
         try
         {
             Logger.LogInformation($"{DateTime.Now} - Updating {DataType} Data...");
-            var data = await GetDksrData();
-            foreach (var weather in data.SensorData)
+            var data = await GetData();
+            foreach (var weather in data)
+            {
                 try
                 {
-                    Thing thing;
-                    var frostThing = await GetFrostThingData(weather.SID);
-                    if (frostThing.Value.Count == 0)
-                    {
-                        thing = Mappers.MapDksrResponse(weather, DataType);
-                        await CreateNewThing(thing);
-                        frostThing = await GetFrostThingData(weather.SID);
-                    }
-
-                    if (frostThing.Value.Count < 1)
-                        throw new Exception($"Creating new thing with id {weather.SID} seems to have failed...");
-
-                    thing = Mappers.MapDksrResponse(weather, DataType);
-                    thing.Id = frostThing.Value.First().Id;
-                    await Update(thing);
+                    var thing = Mappers.MapDksrResponse(weather, DataType);
+                    UpdateThing(thing);
                 }
                 catch (Exception e)
                 {
                     Logger.LogError($"{DateTime.Now} - {e}");
                 }
+            }
         }
         catch (Exception e)
         {
@@ -50,20 +39,19 @@ public class WeatherImporter : Importer
         }
     }
 
-
-    private async Task<WeatherResponse> GetDksrData()
+    private new async Task<List<WeatherSensorData>> GetData()
     {
         try
         {
-            var response =
-                await Client.GetAsync(
-                    Endpoints.GetAuthenticatedDKSREndpointUrl(Username, Password, Endpoints.WeatherEndpoint));
-            var result = await response.Content.ReadAsAsync<WeatherResponse>();
-            return result;
+            var url = Endpoints.GetAuthenticatedEndpointUrl(Username, Password, SourceUrl);
+            var response = await Client.GetAsync(url);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            var result = await response.Content.ReadAsAsync<WeatherSensorDataWrapper>();
+            return result.SensorData.ToList();
         }
         catch (Exception e)
         {
-            Logger.LogError("Getting data from DKSR failed, returning empty response");
+            Logger.LogError("Getting data failed, returning empty response");
             throw new Exception($"{DateTime.Now} - {e}");
         }
     }

@@ -5,16 +5,16 @@ namespace FrostApi.Models.Thing;
 public class Thing
 {
     [JsonIgnore] public int Id { get; set; }
-    [JsonProperty("name")] public string Name { get; private set; }
-    [JsonProperty("description")] public string Description { get; private set; }
+    [JsonProperty("name")] public string Name { get; private set; } = null!;
+    [JsonProperty("description")] public string Description { get; private set; } = null!;
 
     [JsonProperty("properties")]
     [JsonRequired]
-    public Dictionary<string, string> Properties { get; private set; }
+    public Dictionary<string, string> Properties { get; private set; } = null!;
 
     [JsonIgnore] public double Lat { get; private set; }
     [JsonIgnore] public double Lon { get; private set; }
-    [JsonIgnore] public Observation.Observation LatestObservation { get; private set; }
+    [JsonIgnore] public Observation.Observation LatestObservation { get; private set; } = null!;
 
     public static Thing Create(string name, string description, Dictionary<string, string> properties, double lat,
         double lon, Observation.Observation latestObservation)

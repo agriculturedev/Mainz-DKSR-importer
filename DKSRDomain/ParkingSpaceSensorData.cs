@@ -4,7 +4,7 @@ namespace DKSRDomain;
 
 public class ParkingSpaceResponse
 {
-    public ParkingSpaceSensorData[] SensorData { get; set; }
+    public ParkingSpaceSensorData[] SensorData { get; set; } = null!;
 }
 
 //   {
@@ -29,7 +29,7 @@ public class ParkingSpaceResponse
 //       "eventType": "ParkinglotSNEventType"
 //     }
 
-public class ParkingSpaceSensorData
+public class ParkingSpaceSensorData : IDksrResponse
 {
     [JsonProperty("ignored")] public bool Ignored { get; set; }
 
@@ -41,15 +41,13 @@ public class ParkingSpaceSensorData
 
     [JsonProperty("occupied_preliminary")] public bool OccupiedPreliminary { get; set; }
 
-    [JsonProperty("lon")] public double Lon { get; set; }
 
-    [JsonProperty("SID")] public string Sid { get; set; }
 
     [JsonProperty("sensor_id")] public int SensorId { get; set; }
 
     [JsonProperty("had_display")] public bool HasDisplay { get; set; }
 
-    [JsonProperty("additional_info")] public string AdditionalInfo { get; set; }
+    [JsonProperty("additional_info")] public string AdditionalInfo { get; set; } = null!;
 
     [JsonProperty("reserved")] public bool Reserved { get; set; }
 
@@ -61,9 +59,10 @@ public class ParkingSpaceSensorData
 
     [JsonProperty("occupied")] public bool Occupied { get; set; }
 
+    [JsonProperty("SID")] public string Sid { get; set; } = null!;
     [JsonProperty("lat")] public double Lat { get; set; }
-
+    [JsonProperty("lon")] public double Lng { get; set; }
     [JsonProperty("timestamp")] public DateTime Timestamp { get; set; }
 
-    [JsonProperty("_headers")] public Dictionary<string, string> Headers { get; set; }
+    [JsonProperty("_headers")] public Dictionary<string, string> Headers { get; set; } = null!;
 }
