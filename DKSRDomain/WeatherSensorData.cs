@@ -31,6 +31,12 @@ namespace DKSRDomain;
 //     }
 // }
 
+public class WeatherSensorDataWrapper
+{
+    [JsonProperty("sensordata")] public WeatherSensorData[] SensorData { get; set; } = null!;
+
+}
+
 public class WeatherSensorData : IDksrResponse
 {
     [JsonProperty("rain")] public int Rain { get; set; }

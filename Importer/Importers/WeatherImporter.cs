@@ -1,5 +1,6 @@
 using DKSRDomain;
 using Importer.Configuration;
+using Importer.Constants;
 using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
@@ -18,7 +19,7 @@ public class WeatherImporter : Importer
         try
         {
             Logger.LogInformation($"{DateTime.Now} - Updating {DataType} Data...");
-            var data = await GetDksrData<WeatherSensorData>();
+            var data = await GetData();
             foreach (var weather in data)
             {
                 try
@@ -35,6 +36,23 @@ public class WeatherImporter : Importer
         catch (Exception e)
         {
             Logger.LogError($"{DateTime.Now} - {e}");
+        }
+    }
+
+    private new async Task<List<WeatherSensorData>> GetData()
+    {
+        try
+        {
+            var url = Endpoints.GetAuthenticatedEndpointUrl(Username, Password, SourceUrl);
+            var response = await Client.GetAsync(url);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            var result = await response.Content.ReadAsAsync<WeatherSensorDataWrapper>();
+            return result.SensorData.ToList();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Getting data failed, returning empty response");
+            throw new Exception($"{DateTime.Now} - {e}");
         }
     }
 }
