@@ -1,9 +1,9 @@
-using System.Globalization;
 using System.Net;
 using System.Text;
 using DKSRDomain;
 using FrostApi.Models.DataStream;
 using FrostApi.Models.Location;
+using FrostApi.Models.Observation;
 using FrostApi.Models.ObservedProperty;
 using FrostApi.Models.Sensor;
 using FrostApi.Models.Thing;
@@ -17,15 +17,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
 
-public abstract class Importer : IImporter
+public abstract class Importer
 {
-    protected readonly string _dataStreamName;
-    protected readonly FrostApi.FrostApi _frostApi;
+    private readonly FrostApi.FrostApi _frostApi;
     protected readonly HttpClient Client;
     protected readonly string DataType;
     protected readonly ILogger Logger;
 
-    protected Importer(ILogger logger, string dataType, string dataStreamName, DataSource source)
+    protected Importer(ILogger logger, string dataType, DataSource source)
     {
         _frostApi = new FrostApi.FrostApi(source.DestinationUrl);
 
@@ -35,7 +34,6 @@ public abstract class Importer : IImporter
         Client = SetupHttpClient();
         Logger = logger;
         DataType = dataType;
-        _dataStreamName = dataStreamName;
 
         Logger.LogInformation($"{DateTime.Now} - Starting {DataType} Sensor Data Collection");
     }
@@ -117,20 +115,24 @@ public abstract class Importer : IImporter
         if (response.IsSuccessStatusCode)
         {
             Logger.LogDebug($"{DataType} {thing.Name} with Id {thing.Properties["Id"]} updated successfully");
-            var dataStreams = await GetOrCreateDataStream(thing);
-            var dataStream =
-                Mappers.MapFrostResponseToDataStream(dataStreams.Value.Find(dataStream =>
-                    dataStream?.Name == _dataStreamName));
 
             await CreateLocationIfNotExists(thing);
-            await AddObservation(thing, dataStream);
+
+            foreach (var observation in thing.LatestObservations)
+            {
+                var dataStream = await GetOrCreateDataStream(thing, observation);
+                var mappedStream =
+                    Mappers.MapFrostResponseToDataStream(dataStream.Value.Find(stream =>
+                        stream?.Name == observation.Name));
+
+                await AddObservation(observation, thing.Id, mappedStream);
+            }
         }
         else
         {
             Logger.LogError($"{DataType} {thing.Name} with Id {thing.Properties["Id"]} could not be updated");
         }
     }
-
 
     protected async Task CreateLocationIfNotExists(Thing thing)
     {
@@ -204,9 +206,8 @@ public abstract class Importer : IImporter
                 $"?$filter=description eq '{DataType}Sensor' &$filter= properties/id eq '{thing.Properties["Id"]}'");
             sensorResponse = sensors.Value.FirstOrDefault(sensor =>
             {
-                string? treeId;
-                sensor.Properties.TryGetValue("id", out treeId);
-                if (treeId == thing.Properties["Id"] && sensor.Description == $"{DataType}Sensor")
+                sensor.Properties.TryGetValue("id", out var sensorId);
+                if (sensorId == thing.Properties["Id"] && sensor.Description == $"{DataType}Sensor")
                     return true;
                 return false;
             });
@@ -227,31 +228,37 @@ public abstract class Importer : IImporter
     }
 
 
-    protected async Task<ObservedPropertyResponse> GetOrCreateObservedProperty()
+    protected async Task<ObservedPropertyResponse> GetOrCreateObservedProperty(Observation observation)
     {
         var observedProperties = await _frostApi.ObservedProperties.GetAllObservedProperties();
-        var healthStateObservedPropertyResponse =
-            observedProperties.Value.FirstOrDefault(observedProperty => observedProperty.Name == _dataStreamName);
-        if (healthStateObservedPropertyResponse == null)
+
+        var getObserverPropFromResponse = (GetObservedPropertiesResponse? response)
+            => response?.Value.FirstOrDefault(op => op.Name == observation.ObservationType.Name);
+
+        var currentObservationObservedPropertyResponse =
+            getObserverPropFromResponse(observedProperties);
+
+        if (currentObservationObservedPropertyResponse == null)
         {
             await CreateNewObservedProperty(new ObservedProperty
             {
-                Name = _dataStreamName,
-                Description = $"{_dataStreamName} state of a {DataType}",
-                Definition = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
+                Name = observation.ObservationType.Name,
+                Description = observation.ObservationType.Description,
+                Definition = observation.ObservationType.Definition,
             });
 
             observedProperties = await _frostApi.ObservedProperties.GetAllObservedProperties();
-            healthStateObservedPropertyResponse =
-                observedProperties.Value.FirstOrDefault(observedProperty => observedProperty.Name == _dataStreamName);
-            if (healthStateObservedPropertyResponse == null)
+            currentObservationObservedPropertyResponse =
+                getObserverPropFromResponse(observedProperties);
+
+            if (currentObservationObservedPropertyResponse == null)
             {
-                Logger.LogError($"unable to create new {_dataStreamName} Observed property");
-                throw new Exception($"unable to create new {_dataStreamName} Observed property");
+                Logger.LogError($"unable to create new {observation.Name} Observed property");
+                throw new Exception($"unable to create new {observation.Name} Observed property");
             }
         }
 
-        return healthStateObservedPropertyResponse;
+        return currentObservationObservedPropertyResponse;
     }
 
     protected async Task CreateNewObservedProperty(ObservedProperty observedProperty)
@@ -266,67 +273,67 @@ public abstract class Importer : IImporter
     }
 
 
-    protected async Task AddObservation(Thing thing, DataStream dataStream)
+    protected async Task AddObservation(Observation observation, int thingId, DataStream dataStream)
     {
         var observations = await _frostApi.Observations.GetObservationsForDataStream(dataStream.Id);
 
-        if (observations.Value.Any(observation => observation.PhenomenonTime == thing.LatestObservation.PhenomenonTime))
+        if (observations.Value.Any(existingObs => existingObs.PhenomenonTime == observation.PhenomenonTime))
         {
             Logger.LogDebug(
-                $"Observation at timestamp {thing.LatestObservation.PhenomenonTime} for {DataType} {thing.Properties["Id"]} already exists, skipping");
+                $"Observation at timestamp {observation.PhenomenonTime} for {DataType} - {dataStream.Name} already exists, skipping");
             return;
         }
 
-        thing.LatestObservation.DataStream = new Dictionary<string, string> { { "@iot.id", dataStream.Id.ToString() } };
+        observation.DataStream = new Dictionary<string, string> { { "@iot.id", dataStream.Id.ToString() } };
 
-        var response = await _frostApi.Observations.PostObservation(thing.LatestObservation);
+        var response = await _frostApi.Observations.PostObservation(observation);
+        Console.WriteLine(response.Content.ReadAsStringAsync().Result);
         if (response.IsSuccessStatusCode)
         {
             Logger.LogDebug(
-                $"Observation at timestamp {thing.LatestObservation.PhenomenonTime} for {DataType} {thing.Id} created successfully");
+                $"Observation at timestamp {observation.PhenomenonTime} for {DataType} {thingId} created successfully");
         }
         else
         {
             Logger.LogError(
-                $"Observation at timestamp {thing.LatestObservation.PhenomenonTime} for {DataType} {thing.Id} could not be created");
+                $"Observation at timestamp {observation.PhenomenonTime} for {DataType} {thingId} could not be created");
             Logger.LogError(response.Content.ReadAsStringAsync().Result);
         }
     }
 
-
-    protected async Task<GetDataStreamsResponse> GetOrCreateDataStream(Thing thing)
+    protected async Task<GetDataStreamsResponse> GetOrCreateDataStream(Thing thing, Observation observation)
     {
         var dataStreams = await GetFrostDataStreamData(thing.Id);
-        if (dataStreams?.Value == null || dataStreams.Value.Count == 0)
+        if (dataStreams?.Value == null || dataStreams.Value.Count < thing.LatestObservations.Count) // TODO@JOREN: probably needs smarter checking to see which streams need to be created
         {
-            await CreateNewDataStream(thing);
+            await CreateNewDataStream(thing, observation);
 
             dataStreams = await GetFrostDataStreamData(thing.Id);
-            if (dataStreams?.Value == null || dataStreams.Value.Count == 0)
+            if (dataStreams?.Value == null) // TODO@JOREN: Also should be smarter
             {
-                Logger.LogError($"unable to create new {_dataStreamName} Datastream");
-                throw new Exception($"unable to create new {_dataStreamName} Datastream");
+                Logger.LogError($"unable to create new {observation.Name} Datastream");
+                throw new Exception($"unable to create new {observation.Name} Datastream");
             }
         }
 
         return dataStreams;
     }
 
-    protected async Task CreateNewDataStream(Thing thing)
+    protected async Task CreateNewDataStream(Thing thing, Observation observation)
     {
-        var observedPropertyResponse = await GetOrCreateObservedProperty();
+        var observedPropertyResponse = await GetOrCreateObservedProperty(observation);
         var sensor = await GetOrCreateSensor(thing);
 
         var dataStream = new DataStream
         {
-            Name = $"{_dataStreamName}",
-            Description = $"{_dataStreamName} status of a {DataType}",
-            ObservationType = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+            Name = $"{observation.Name}",
+            Description = $"{observation.Name} status of a {DataType}",
+            ObservationType = $"{observation.ObservationType.Name}",
             UnitOfMeasurement = new UnitOfMeasurement
             {
-                Name = $"{_dataStreamName}",
-                Symbol = $"{_dataStreamName}",
-                Definition = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
+                Name = $"{observation.UnitOfMeasurementName}",
+                Symbol = $"{observation.UnitOfMeasurementSymbol}",
+                Definition = $"{observation.UnitOfMeasurementDefinition}"
             },
             ObservedArea = new ObservedArea
             {

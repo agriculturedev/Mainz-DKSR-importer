@@ -9,7 +9,7 @@ public class ParkingSpaceImporter : Importer
 {
     private Timer _importerTimer;
 
-    public ParkingSpaceImporter(ILogger logger, DataSource dataSource) : base(logger, "ParkingSpace", "Occupancy", dataSource)
+    public ParkingSpaceImporter(ILogger logger, DataSource dataSource) : base(logger, "ParkingSpace", dataSource)
     {
         _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 2); // every 2 minutes
     }
