@@ -19,7 +19,7 @@ public class ParkingSpaceImporter : Importer
         try
         {
             Logger.LogInformation($"{DateTime.Now} - Updating {DataType} Data...");
-            var data = await GetDksrData<ParkingSpaceSensorData>();
+            var data = await GetData<ParkingSpaceSensorData>();
             foreach (var parkingSpace in data)
             {
                 try

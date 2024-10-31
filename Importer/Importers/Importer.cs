@@ -17,10 +17,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Importer.Importers;
 
-public abstract class Importer
+public abstract class Importer : IImporter
 {
-    private readonly string _dataStreamName;
-    private readonly FrostApi.FrostApi _frostApi;
+    protected readonly string _dataStreamName;
+    protected readonly FrostApi.FrostApi _frostApi;
     protected readonly HttpClient Client;
     protected readonly string DataType;
     protected readonly ILogger Logger;
@@ -63,7 +63,7 @@ public abstract class Importer
 
     protected abstract void Import(object? _);
 
-    protected async Task<List<T>> GetDksrData<T>() where T : IDksrResponse
+    protected async Task<List<T>> GetData<T>() where T : IDksrResponse
     {
         try
         {
@@ -132,7 +132,7 @@ public abstract class Importer
     }
 
 
-    private async Task CreateLocationIfNotExists(Thing thing)
+    protected async Task CreateLocationIfNotExists(Thing thing)
     {
         var locations = await _frostApi.Locations.GetLocationsForThing(thing.Id);
         if (locations?.Value == null || locations.Value.Count == 0)
@@ -148,7 +148,7 @@ public abstract class Importer
         }
     }
 
-    private async Task CreateNewLocation(Thing thing)
+    protected async Task CreateNewLocation(Thing thing)
     {
         var location = new ThingLocation
         {
@@ -171,7 +171,7 @@ public abstract class Importer
     }
 
 
-    private async Task<SensorResponse> GetOrCreateSensor(Thing thing)
+    protected async Task<SensorResponse> GetOrCreateSensor(Thing thing)
     {
         var sensors = await _frostApi.Sensors.GetAllSensors();
         SensorResponse? sensorResponse;
@@ -217,7 +217,7 @@ public abstract class Importer
         return sensorResponse;
     }
 
-    private async Task CreateNewSensor(Sensor sensor)
+    protected async Task CreateNewSensor(Sensor sensor)
     {
         var response = await _frostApi.Sensors.PostSensor(sensor);
         if (response.IsSuccessStatusCode)
@@ -227,7 +227,7 @@ public abstract class Importer
     }
 
 
-    private async Task<ObservedPropertyResponse> GetOrCreateObservedProperty()
+    protected async Task<ObservedPropertyResponse> GetOrCreateObservedProperty()
     {
         var observedProperties = await _frostApi.ObservedProperties.GetAllObservedProperties();
         var healthStateObservedPropertyResponse =
@@ -254,7 +254,7 @@ public abstract class Importer
         return healthStateObservedPropertyResponse;
     }
 
-    private async Task CreateNewObservedProperty(ObservedProperty observedProperty)
+    protected async Task CreateNewObservedProperty(ObservedProperty observedProperty)
     {
         var response = await _frostApi.ObservedProperties.PostObservedProperty(observedProperty);
         if (response.IsSuccessStatusCode)
@@ -266,7 +266,7 @@ public abstract class Importer
     }
 
 
-    private async Task AddObservation(Thing thing, DataStream dataStream)
+    protected async Task AddObservation(Thing thing, DataStream dataStream)
     {
         var observations = await _frostApi.Observations.GetObservationsForDataStream(dataStream.Id);
 
@@ -294,7 +294,7 @@ public abstract class Importer
     }
 
 
-    private async Task<GetDataStreamsResponse> GetOrCreateDataStream(Thing thing)
+    protected async Task<GetDataStreamsResponse> GetOrCreateDataStream(Thing thing)
     {
         var dataStreams = await GetFrostDataStreamData(thing.Id);
         if (dataStreams?.Value == null || dataStreams.Value.Count == 0)
@@ -312,7 +312,7 @@ public abstract class Importer
         return dataStreams;
     }
 
-    private async Task CreateNewDataStream(Thing thing)
+    protected async Task CreateNewDataStream(Thing thing)
     {
         var observedPropertyResponse = await GetOrCreateObservedProperty();
         var sensor = await GetOrCreateSensor(thing);
@@ -351,7 +351,7 @@ public abstract class Importer
         return _frostApi.Things.GetAllThings($"?$filter=description eq '{DataType}' &$filter= properties/Id eq '{id}'");
     }
 
-    private Task<GetDataStreamsResponse?> GetFrostDataStreamData(int thingId)
+    protected Task<GetDataStreamsResponse?> GetFrostDataStreamData(int thingId)
     {
         return _frostApi.DataStreams.GetDataSteamsForThing(thingId);
     }
