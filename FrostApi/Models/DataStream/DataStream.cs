@@ -16,6 +16,7 @@ public class DataStream
 
     [JsonProperty("observedArea")] public ObservedArea ObservedArea { get; set; } = null!;
 
+    [JsonProperty("properties")] public Dictionary<string, string> Properties { get; set; } = null!;
     public Dictionary<string, string> Thing { get; set; } = null!;
 
     public Dictionary<string, string> Sensor { get; set; } = null!;

@@ -32,10 +32,4 @@ public class Thing
             LatestObservation = latestObservation
         };
     }
-
-    public static Thing Create(string name, string description, Dictionary<string, string> properties, string lat,
-        string lon, Observation.Observation latestObservation)
-    {
-        return Create(name, description, properties, double.Parse(lat), double.Parse(lon), latestObservation);
-    }
 }
