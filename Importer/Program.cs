@@ -16,7 +16,7 @@ internal class Program
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
-        var importers = new List<Importers.Importer>();
+        var importers = new List<IImporter>();
 
         foreach (var source in ConfigurationManager.Sources.Sources)
         {
