@@ -12,7 +12,7 @@ public static class Mappers
     {
         var properties = new Dictionary<string, string> { { "Id", treeData.Sid } };
 
-        var observation = new Observation { Result = treeData.HealthState, PhenomenonTime = treeData.Timestamp };
+        var observation = new Observation { Result = treeData.HealthState, PhenomenonTime = treeData.Timestamp, ResultTime = treeData.Timestamp };
 
         return Thing.Create($"{dataType}-{treeData.Sid}", dataType, properties, treeData.Lat, treeData.Lng, observation);
     }
@@ -26,7 +26,7 @@ public static class Mappers
             { "ParkingLotId", parkingSpace.ParkingLotId.ToString() }
         };
 
-        var observation = new Observation { Result = parkingSpace.Occupied, PhenomenonTime = parkingSpace.Timestamp };
+        var observation = new Observation { Result = parkingSpace.Occupied, PhenomenonTime = parkingSpace.Timestamp, ResultTime = parkingSpace.Timestamp };
 
         return Thing.Create($"{dataType}-{parkingSpace.Sid}", dataType, properties, parkingSpace.Lat, parkingSpace.Lng, observation);
     }
@@ -46,9 +46,9 @@ public static class Mappers
             { "Cloudiness", weather.Clouds.ToString() }
         };
 
-        var observation = new Observation { Result = weather.Temp, PhenomenonTime = weather.Timestamp };
+        var observation = new Observation { Result = weather.Temp, PhenomenonTime = weather.Timestamp, ResultTime = weather.Timestamp};
 
-        return Thing.Create($"{dataType}-{weather.Sid}", dataType, properties, weather.Lat, weather.Lng, observation);
+        return Thing.Create(dataType, dataType, properties, weather.Lat, weather.Lng, observation);
     }
 
     public static DataStream MapFrostResponseToDataStream(DataStreamResponse? response)
@@ -65,7 +65,8 @@ public static class Mappers
             Description = response.Description,
             ObservationType = response.ObservationType,
             UnitOfMeasurement = response.UnitOfMeasurement,
-            ObservedArea = response.ObservedArea
+            ObservedArea = response.ObservedArea,
+            Properties = response.Properties
         };
 
         return datastream;
