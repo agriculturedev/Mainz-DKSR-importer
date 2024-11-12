@@ -21,6 +21,8 @@ public class DataStreamResponse
 
     public string PhenomenonTime { get; set; } = null!;
 
+    public Dictionary<string, string> Properties { get; set; } = null!;
+
     [JsonProperty("ObservedProperty@iot.navigationLink")]
     public string ObservedPropertyNavigationLink { get; set; } = null!;
 

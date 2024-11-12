@@ -14,10 +14,10 @@ public class Thing
 
     [JsonIgnore] public double Lat { get; private set; }
     [JsonIgnore] public double Lon { get; private set; }
-    [JsonIgnore] public Observation.Observation LatestObservation { get; private set; } = null!;
+    [JsonIgnore] public List<Observation.Observation> LatestObservations { get; private set; } = null!;
 
     public static Thing Create(string name, string description, Dictionary<string, string> properties, double lat,
-        double lon, Observation.Observation latestObservation)
+        double lon, List<Observation.Observation> latestObservations)
     {
         if (!properties.ContainsKey("Id"))
             throw new ArgumentException("Properties must contain a key 'Id'");
@@ -29,13 +29,7 @@ public class Thing
             Properties = properties,
             Lat = lat,
             Lon = lon,
-            LatestObservation = latestObservation
+            LatestObservations = latestObservations
         };
-    }
-
-    public static Thing Create(string name, string description, Dictionary<string, string> properties, string lat,
-        string lon, Observation.Observation latestObservation)
-    {
-        return Create(name, description, properties, double.Parse(lat), double.Parse(lon), latestObservation);
     }
 }

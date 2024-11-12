@@ -1,3 +1,4 @@
+
 using DKSRDomain;
 using Importer.Configuration;
 using Importer.Constants;
@@ -9,7 +10,7 @@ public class WeatherImporter : Importer
 {
     private Timer _importerTimer;
 
-    public WeatherImporter(ILogger logger, DataSource dataSource) : base(logger, "Weather", "weather", dataSource)
+    public WeatherImporter(ILogger logger, DataSource dataSource) : base(logger, "hof_owm_connector", dataSource)
     {
         _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 60); // every hour
     }
@@ -39,7 +40,7 @@ public class WeatherImporter : Importer
         }
     }
 
-    private new async Task<List<WeatherSensorData>> GetData()
+    private async Task<List<WeatherSensorData>> GetData()
     {
         try
         {

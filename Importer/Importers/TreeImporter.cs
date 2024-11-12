@@ -8,7 +8,7 @@ public class TreeImporter : Importer
 {
     private Timer _importerTimer;
 
-    public TreeImporter(ILogger logger, DataSource dataSource) : base(logger, "Tree", "HealthState", dataSource)
+    public TreeImporter(ILogger logger, DataSource dataSource) : base(logger, "Tree", dataSource)
     {
         _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 60); // every hour
     }
@@ -18,7 +18,7 @@ public class TreeImporter : Importer
         try
         {
             Logger.LogInformation($"{DateTime.Now} - Updating {DataType} Data...");
-            var data = await GetDksrData<TreeSenseSensorData>();
+            var data = await GetData<TreeSenseSensorData>();
             foreach (var dksrTree in data)
             {
                 try

@@ -9,7 +9,7 @@ public class ParkingSpaceImporter : Importer
 {
     private Timer _importerTimer;
 
-    public ParkingSpaceImporter(ILogger logger, DataSource dataSource) : base(logger, "ParkingSpace", "Occupancy", dataSource)
+    public ParkingSpaceImporter(ILogger logger, DataSource dataSource) : base(logger, "ParkingSpace", dataSource)
     {
         _importerTimer = new Timer(Import, null, 0, 60 * 1000 * 2); // every 2 minutes
     }
@@ -19,7 +19,7 @@ public class ParkingSpaceImporter : Importer
         try
         {
             Logger.LogInformation($"{DateTime.Now} - Updating {DataType} Data...");
-            var data = await GetDksrData<ParkingSpaceSensorData>();
+            var data = await GetData<ParkingSpaceSensorData>();
             foreach (var parkingSpace in data)
             {
                 try

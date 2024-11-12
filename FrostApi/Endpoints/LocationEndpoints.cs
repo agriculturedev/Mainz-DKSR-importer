@@ -29,14 +29,14 @@ public class LocationEndpoints : FrostHttpClient
 
     public async Task<HttpResponseMessage> PostLocation(ThingLocation Location)
     {
-        var content = CreateJsonContent(Location);
+        var content = CreateGeoJsonContent(Location);
         var response = await Client.PostAsync(Endpoints.GetEndpointUrl(Endpoints.Locations), content);
         return response;
     }
 
     public async Task<HttpResponseMessage> UpdateLocation(ThingLocation Location)
     {
-        var content = CreateJsonContent(Location);
+        var content = CreateGeoJsonContent(Location);
         var url = $"{Endpoints.GetEndpointUrl(Endpoints.Locations)}({Location.Id})";
         var response = await Client.PatchAsync(url, content);
         return response;

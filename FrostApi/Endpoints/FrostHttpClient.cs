@@ -38,6 +38,13 @@ public abstract class FrostHttpClient
         return content;
     }
 
+    protected StringContent CreateGeoJsonContent(object obj)
+    {
+        var jsonContent = JsonConvert.SerializeObject(obj);
+        var content = new StringContent(jsonContent, Encoding.UTF8, "application/geo+json");
+        return content;
+    }
+
     protected async Task<HttpResponseMessage> PostAsync(string requestUrl, StringContent requestContent)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
